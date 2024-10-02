@@ -1,6 +1,7 @@
 package com.dme.DormitoryProject.apiController;
 
 import com.dme.DormitoryProject.Manager.Abstract.IRentalService;
+import com.dme.DormitoryProject.dtos.rentalDtos.RentalDTO;
 import com.dme.DormitoryProject.entity.Rental;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,21 +20,21 @@ public class RentalController {
     }
 
     @GetMapping("getAll")
-    public List<Rental> getAll(){
+    public List<RentalDTO> getAll(){
         return this.rentalService.getAll();
     }
 
     @GetMapping("rentalId/{id}")
-    public Optional<Rental> getById(@PathVariable Long id){
+    public Optional<RentalDTO> getById(@PathVariable Long id){
         return this.rentalService.getById(id);
     }
     @PostMapping("saveRental")
-    public Rental saveRental(@RequestBody Rental rental){
-        return this.rentalService.saveRental(rental);
+    public Rental saveRental(@RequestBody RentalDTO rentalDTO){
+        return this.rentalService.saveRental(rentalDTO);
     }
     @PutMapping("update/{id}")
-    public Rental updateRental(@PathVariable Long id,@RequestBody Rental rental){
-        return this.rentalService.updateRental(id,rental);
+    public Rental updateRental(@PathVariable Long id,@RequestBody RentalDTO rentalDTO){
+        return this.rentalService.updateRental(id,rentalDTO);
     }
     @PutMapping("delete/{id}")
     public Rental deleteRental(@PathVariable Long id){

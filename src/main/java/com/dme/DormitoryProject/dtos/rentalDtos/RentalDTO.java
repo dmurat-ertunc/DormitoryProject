@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class RentalDTO {
+    private Long id;
     private Long sportAreaId; // SportArea varlığının id'si
     private LocalDate rentalDate;
     private LocalTime startTime;
@@ -16,6 +17,13 @@ public class RentalDTO {
     private String studentTcNo;
     private boolean studentVerify;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public LocalDate getStudentBirthDate() {
         return studentBirthDate;

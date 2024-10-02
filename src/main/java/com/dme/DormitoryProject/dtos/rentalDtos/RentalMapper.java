@@ -1,11 +1,15 @@
 package com.dme.DormitoryProject.dtos.rentalDtos;
 
 import com.dme.DormitoryProject.entity.Rental;
+import com.dme.DormitoryProject.repository.IRentalDao;
+import com.dme.DormitoryProject.repository.ISportAreaDao;
+import com.dme.DormitoryProject.repository.IStudentDao;
 
 public class RentalMapper {
     public static RentalDTO toDTO(Rental rental){
         RentalDTO rentalDTO = new RentalDTO();
 
+        rentalDTO.setId(rental.getId());
         rentalDTO.setEndTime(rental.getEndTime());
         rentalDTO.setRentalDate(rental.getRentalDate());
         rentalDTO.setStartTime(rental.getStartTime());
@@ -21,20 +25,14 @@ public class RentalMapper {
         return rentalDTO;
     }
 
-    public static Rental toEntity(RentalDTO rentalDTO){
+    public static Rental toEntity(RentalDTO rentalDTO, IStudentDao studentDao, ISportAreaDao sportAreaDao){
         Rental rental = new Rental();
 
         rental.setEndTime(rentalDTO.getEndTime());
         rental.setRentalDate(rentalDTO.getRentalDate());
         rental.setStartTime(rentalDTO.getStartTime());
-        rental.getSportArea().setId(rentalDTO.getSportAreaId());
-        rental.getStudent().setId(rentalDTO.getStudentId());
-        rental.getStudent().setBirthDate(rentalDTO.getStudentBirthDate());
-        rental.getStudent().setMail(rentalDTO.getStudentMail());
-        rental.getStudent().setName(rentalDTO.getStudentName());
-        rental.getStudent().setSurName(rentalDTO.getStudentSurName());
-        rental.getStudent().setTcNo(rentalDTO.getStudentTcNo());
-        rental.getStudent().setVerify(rentalDTO.isStudentVerify());
+        rental.setStudent(studentDao.getById(rentalDTO.getStudentId()));
+        rental.setSportArea(sportAreaDao.getById(rentalDTO.getSportAreaId()));
 
         return rental;
     }
