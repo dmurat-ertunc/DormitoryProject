@@ -1,6 +1,10 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import com.dme.DormitoryProject.Manager.Abstract.ISporAreaService;
+import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
+import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
+import com.dme.DormitoryProject.dtos.sportAreaDtos.SportAreaDTO;
+import com.dme.DormitoryProject.dtos.sportAreaDtos.SportAreaMapper;
 import com.dme.DormitoryProject.entity.*;
 import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
@@ -11,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,43 +46,58 @@ public class SportAreaManager implements ISporAreaService {
         log.setMessage(message);
         lgoDao.save(log);
     }
-    @Override
-    public List<SportArea> getAll(){
-        LogLevelSave(2,"Tüm spor alanları listelendi");
-        return sportAreaDao.findAll();
+
+    public List<SportAreaDTO> entityToDto(List<SportArea> sportAreas){
+        List<SportAreaDTO> sportAreaDTOS = new ArrayList<>();
+
+        for (SportArea sportArea : sportAreas) {
+            SportAreaDTO dto = SportAreaMapper.toDTO(sportArea);
+            sportAreaDTOS.add(dto);
+        }
+        return sportAreaDTOS;
+    }
+
+    public SportArea dtoToEntity(SportAreaDTO sportAreaDTO){
+        return SportAreaMapper.toEntity(sportAreaDTO);
     }
 
     @Override
-    public Optional<SportArea> getById(Long id){
-        Optional<SportArea> sportArea = sportAreaDao.findById(id);
+    public List<SportAreaDTO> getAll(){
+        List<SportArea> sportAreaList = sportAreaDao.findAll();
+        LogLevelSave(2,"Tüm spor alanları listelendi");
+        return entityToDto(sportAreaList);
+    }
+
+    @Override
+    public Optional<SportAreaDTO> getById(Long id){
+        List<SportAreaDTO> sportAreaDTO = entityToDto(sportAreaDao.findAll());
         LogLevelSave(2,"Id değeri verilen spor alanı listelendi");
-        return sportArea;
+        return sportAreaDTO.stream()
+                .filter(dto -> dto.getId().equals(id))
+                .findFirst();
     }
     @Override
-    public SportArea saveSportArea(SportArea sportArea){
-        if(sportArea.getSporType() == null){
+    public SportArea saveSportArea(SportAreaDTO sportAreaDTO){
+        if(sportAreaDTO.getSportType() == null || Objects.equals(sportAreaDTO.getSportType(), "")){
             LogLevelSave(4,"Spor alanı eklerken boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
-        sportArea.setSporType(sportArea.getSporType());
-        sportArea.setAddDate(getMomentDate());
         LogLevelSave(2,"Spor alanı eklendi.");
-        return sportAreaDao.save(sportArea);
+        return sportAreaDao.save(dtoToEntity(sportAreaDTO));
     }
     @Override
-    public SportArea updateSportArea(Long id,SportArea sportArea){
+    public SportArea updateSportArea(Long id,SportAreaDTO sportAreaDTO){
         SportArea editSportArea = sportAreaDao.findById(id)
                 .orElseThrow(() ->{
                     LogLevelSave(1,"Bu id değerine ait bir spor alanı bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
 
-        if(sportArea.getSporType().toString() == ""){
+        if(Objects.equals(sportAreaDTO.getSportType(),null) || Objects.equals(sportAreaDTO.getSportType(),"")){
             LogLevelSave(4,"Spor alanı güncellerken boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
-        editSportArea.setSporType(sportArea.getSporType());
-        editSportArea.setAddDate(getMomentDate());
+        editSportArea.setSporType(sportAreaDTO.getSportType());
         LogLevelSave(3,"Spor alanı güncelleme işlemi başarılı");
         return sportAreaDao.save(editSportArea);
     }
