@@ -8,6 +8,7 @@ import com.dme.DormitoryProject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -115,13 +116,13 @@ public class StudentManager implements IStudentService{
         }
         List<Student> students = studentDao.findAll();
 
-        for (Student student: students){
-            if(Objects.equals(student.getTcNo(), studentDTO.getTcNo())){
-                LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-
+        //for (Student student: students){
+        //    if(Objects.equals(student.getTcNo(), studentDTO.getTcNo()) && !Objects.equals(student.getId(),id)){
+        //        LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
+        //        throw new RuntimeException("hata");
+        //    }
+        //}
+        checkStudent(3L,studentDTO);
         editStudent.setName(studentDTO.getName());
         editStudent.setTcNo(studentDTO.getTcNo());
         editStudent.setBirthDate(studentDTO.getBirthDate());
@@ -129,6 +130,33 @@ public class StudentManager implements IStudentService{
         editStudent.setMail(studentDTO.getMail());
         LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
         return studentDao.save(editStudent);
+    }
+
+    public Map<String, Object> checkStudent(Long id, StudentDTO studentDTO){
+        Map<String, Object> responseMap = new HashMap<>();
+        List<Student> studentList = studentDao.findAll();
+        Student editStudent = studentDao.getById(id);
+        studentList.remove(editStudent);
+        checkField(editStudent, studentList, studentDTO);
+        return responseMap;
+    }
+
+    public Boolean checkField(Student editStudent, List<Student> studentList, StudentDTO studentDTO){
+        Class<?> clazz = editStudent.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            field.setAccessible(true); // Özel alanlara erişmek için gerekli
+            try {
+                Object value = field.get(editStudent); // Alanın değeri
+                    System.out.println(field.getName() + ": " + value); // Alan adı ve değeri yazdır
+                if(Objects.equals(field.getName(), studentDTO)){
+
+                }
+            } catch (IllegalAccessException e) {
+                e.printStackTrace(); // Alan değerine erişimde hata olursa yakala
+            }
+        }
+        return false;
     }
 
     @Override
