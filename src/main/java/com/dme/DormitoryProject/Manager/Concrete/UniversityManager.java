@@ -1,6 +1,10 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import com.dme.DormitoryProject.Manager.Abstract.IUniversityService;
+import com.dme.DormitoryProject.dtos.staffDtos.StaffDTO;
+import com.dme.DormitoryProject.dtos.staffDtos.StaffMapper;
+import com.dme.DormitoryProject.dtos.universityDtos.UniversityDTO;
+import com.dme.DormitoryProject.dtos.universityDtos.UniversityMapper;
 import com.dme.DormitoryProject.entity.*;
 import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
@@ -10,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,48 +43,63 @@ public class UniversityManager implements IUniversityService {
         log.setMessage(message);
         lgoDao.save(log);
     }
+    public List<UniversityDTO> entityToDto(List<University> universities){
+        List<UniversityDTO> universityDTOS = new ArrayList<>();
 
+        for (University university : universities) {
+            UniversityDTO dto = UniversityMapper.toDTO(university);
+            universityDTOS.add(dto);
+        }
+        return universityDTOS;
+    }
+
+    public University dtoToEntity(UniversityDTO universityDTO){
+        return UniversityMapper.toEntity(universityDTO,studentDao);
+    }
     @Override
-    public List<University> getAll(){
+    public List<UniversityDTO> getAll(){
+        List<University> universities = universityDao.findAll();
         LogLevelSave(2,"Tüm üniversiteler listelendi");
-        return universityDao.findAll();
+        return entityToDto(universities);
     }
     @Override
-    public Optional<University> getById(Long id){
-        Optional<University> university=universityDao.findById(id);
+    public Optional<UniversityDTO> getById(Long id){
+        List<UniversityDTO> universityDTOS = entityToDto(universityDao.findAll());
         LogLevelSave(2,"Id değerine göre üniversite listelendi.");
-        return university;
+        return universityDTOS.stream()
+                .filter(dto -> dto.getId().equals(id))
+                .findFirst();
     }
     @Override
-    public University saveUniversity(University university){
-        if(university.getcity() == "" || university.getmail() == "" || university.getName() == "" || university.getphoneNumber() == ""){
+    public University saveUniversity(UniversityDTO universityDTO){
+        if(universityDTO.getCity() == "" || universityDTO.getMail() == "" || universityDTO.getName() == "" || universityDTO.getPhoneNumber() == ""){
             LogLevelSave(4,"Üniversite ekleme işleminde boş alan bırakılamaz");
             throw  new RuntimeException("hata");
         }
-        if(!(university.getphoneNumber().length() == 11 && university.getphoneNumber().startsWith("0"))){
+        if(!(universityDTO.getPhoneNumber().length() == 11 && universityDTO.getPhoneNumber().startsWith("0"))){
             LogLevelSave(4,"Üniversite ekleme işleminde telefon numarasını alanını uıygun girin");
             throw  new RuntimeException("hata");
         }
-        university.setAddDate(getMomentDate());
+
         LogLevelSave(3,"Üniversite ekleme işlemi başarılı");
-        return universityDao.save(university);
+        return universityDao.save(dtoToEntity(universityDTO));
     }
     @Override
-    public University updateUniversity(Long id, University university) {
+    public University updateUniversity(Long id, UniversityDTO universityDTO) {
         University editUniversity = universityDao.findById(id)
                 .orElseThrow(() ->{
                     LogLevelSave(1,"Bu id değerine ait bir üniversite bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
 
-        if (university.getName() == "" || university.getphoneNumber() == "" || university.getcity() == "" || university.getmail() == ""){
+        if (universityDTO.getName() == "" || universityDTO.getPhoneNumber() == "" || universityDTO.getCity() == "" || universityDTO.getMail() == ""){
             LogLevelSave(4,"Üniversite güncelleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Üniversite güncelleme işleminde boş alan bırakılamaz. " + id);
         }
-        editUniversity.setName(university.getName());
-        editUniversity.setcity(university.getcity());
-        editUniversity.setmail(university.getmail());
-        editUniversity.setphoneNumber(university.getphoneNumber());
+        editUniversity.setName(universityDTO.getName());
+        editUniversity.setcity(universityDTO.getCity());
+        editUniversity.setmail(universityDTO.getMail());
+        editUniversity.setphoneNumber(universityDTO.getPhoneNumber());
         LogLevelSave(3,"Üniversite güncelleme işlemi başarılı.");
         return universityDao.save(editUniversity);
     }
