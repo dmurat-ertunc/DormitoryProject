@@ -1,14 +1,15 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
+import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
+import com.dme.DormitoryProject.dtos.studentDtos.StudentMapper;
 import com.dme.DormitoryProject.entity.*;
 import com.dme.DormitoryProject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class StudentManager implements IStudentService{
@@ -27,7 +28,19 @@ public class StudentManager implements IStudentService{
         this.logLevelDao = logLevelDao;
         this.universityDao = universityDao;
     }
+    public List<StudentDTO> entityToDto(List<Student> students){
+        List<StudentDTO> studentDTOS = new ArrayList<>();
 
+        for (Student student : students) {
+            StudentDTO dto = StudentMapper.toDto(student);
+            studentDTOS.add(dto);
+        }
+        return studentDTOS;
+    }
+
+    public Student dtoToEntity(StudentDTO studentDTO){
+        return StudentMapper.toEntity(studentDTO,universityDao);
+    }
 
     public void LogLevelSave(long id,String message){
         Lgo log = new Lgo();
@@ -41,15 +54,19 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
-    public List<Student> getAll(){
+    public List<StudentDTO> getAll(){
+        List<Student> studentList = studentDao.findAll();
         LogLevelSave(2,"Tüm öğrenciler listelendi");
-        return studentDao.findAll();
+        return entityToDto(studentList);
     }
 
     @Override
-    public Student findStudentById(Long id){
+    public Optional<StudentDTO> findStudentById(Long id){
+        List<StudentDTO> studentDTO = entityToDto(studentDao.findAll());
         LogLevelSave(2,"Id değerine ait öğrenci listelendi");
-        return studentDao.findStudentById(id);
+        return studentDTO.stream()
+                .filter(dto -> dto.getId().equals(id))
+                .findFirst();
     }
 
     @Override
@@ -58,41 +75,59 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
-    public Student saveStudent(Student student){
-        if(student.getUniversity() == null || student.getMail() == "" || student.getName() == "" || student.getSurName() == "" || student.getTcNo() == "" || student.getBirthDate() == null){
+    public Student saveStudent(StudentDTO studentDTO){
+        if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci ekleme işleminde boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
-        if(!(student.getTcNo().length() == 11)){
+        if(!(studentDTO.getTcNo().length() == 11)){
             LogLevelSave(4,"Öğrenci ekleme işleminde TC kimlik numarısını uygun giriniz");
             throw new RuntimeException("hata");
         }
+        List<Student> students = studentDao.findAll();
 
-
-        student.setAddDate(getMomentDate());
-        student.setVerify(false);
+        for (Student student: students){
+            if(Objects.equals(student.getTcNo(), studentDTO.getTcNo())){
+                LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+        studentDTO.setVerify(false);
         LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
-        return studentDao.save(student);
+        return studentDao.save(dtoToEntity(studentDTO));
     }
 
     @Override
-    public Student updateStudent(Long id, Student student){
+    public Student updateStudent(Long id, StudentDTO studentDTO){
         Student editStudent = studentDao.findById(id)
                 .orElseThrow(() ->{
                     LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
 
-        if(student.getUniversity() == null || student.getMail() == "" || student.getName() == "" || student.getSurName() == "" || student.getTcNo() == "" || student.getBirthDate() == null){
+        if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci güncelleme işleminde boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
-        if(!(student.getTcNo().length() == 11)){
+        if(!(studentDTO.getTcNo().length() == 11)){
             LogLevelSave(4,"Öğrenci güncelleme işleminde TC kimlik numarısını uygun giriniz");
             throw new RuntimeException("hata");
         }
-        editStudent.setName(student.getName());
-        LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı.");
+        List<Student> students = studentDao.findAll();
+
+        for (Student student: students){
+            if(Objects.equals(student.getTcNo(), studentDTO.getTcNo())){
+                LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+
+        editStudent.setName(studentDTO.getName());
+        editStudent.setTcNo(studentDTO.getTcNo());
+        editStudent.setBirthDate(studentDTO.getBirthDate());
+        editStudent.setSurName(studentDTO.getSurName());
+        editStudent.setMail(studentDTO.getMail());
+        LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
         return studentDao.save(editStudent);
     }
 

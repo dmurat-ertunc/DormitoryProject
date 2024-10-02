@@ -3,12 +3,14 @@ package com.dme.DormitoryProject.apiController;
 
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
 import com.dme.DormitoryProject.Manager.Concrete.StudentManager;
+import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.entity.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/students/")
@@ -22,16 +24,12 @@ public class StudentController {
     }
 
     @GetMapping("getAll")
-    public List<Student> getAll(){
+    public List<StudentDTO> getAll(){
         return studentService.getAll();
     }
 
     @GetMapping("studentId/{id}")
-    public Student getById(@PathVariable Long id){
-        if (id == null){
-            System.out.println("id boş");
-        }
-        System.out.println("başarılı");
+    public Optional<StudentDTO> getById(@PathVariable Long id){
         return this.studentService.findStudentById(id);
     }
 
@@ -42,8 +40,8 @@ public class StudentController {
     }
 
     @PostMapping("saveStudent")
-    public Student saveStudent(@RequestBody Student student){
-        return this.studentService.saveStudent(student);
+    public Student saveStudent(@RequestBody StudentDTO studentDTO){
+        return this.studentService.saveStudent(studentDTO);
     }
 
     @PostMapping("saveStudentsAll")
@@ -51,8 +49,8 @@ public class StudentController {
         return this.studentService.saveStudentAll(students);
     }
     @PutMapping("update/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student student){
-        return this.studentService.updateStudent(id,student);
+    public Student updateStudent(@PathVariable Long id, @RequestBody StudentDTO studentDTO){
+        return this.studentService.updateStudent(id,studentDTO);
     }
     @PutMapping("delete/{id}")
     public Student deleteStudent(@PathVariable Long id){
