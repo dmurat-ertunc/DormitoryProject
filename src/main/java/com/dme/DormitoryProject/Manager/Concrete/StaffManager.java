@@ -80,6 +80,19 @@ public class StaffManager implements IStaffService {
             LogLevelSave(1,"Personel ekleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }
+        List<Staff> staffs = staffDao.findAll();
+        for (Staff staff: staffs){
+            if(Objects.equals(staff.getMail(), staff.getMail())){
+                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+        for (Staff staff: staffs){
+            if(Objects.equals(staff.getPhoneNumber(), staff.getPhoneNumber())){
+                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
         if (!(staffDTO.getPhoneNumber().length() == 11 && staffDTO.getPhoneNumber().startsWith("0"))) {
             LogLevelSave(1,"Personel ekleme işleminde telefon numarası alanına uygun girin.");
             throw new RuntimeException("Hata");
@@ -107,7 +120,19 @@ public class StaffManager implements IStaffService {
             LogLevelSave(1,"Personel güncelleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }
-
+        List<Staff> staffs = staffDao.findAll();
+        for (Staff staff: staffs){
+            if(Objects.equals(staff.getMail(), staff.getMail()) && !Objects.equals(staffDTO.getId(),id)){
+                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+        for (Staff staff: staffs){
+            if(Objects.equals(staff.getPhoneNumber(), staff.getPhoneNumber()) && !Objects.equals(staffDTO.getId(),id)){
+                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
         if (!(staffDTO.getPhoneNumber().length() == 11 && staffDTO.getPhoneNumber().startsWith("0"))) {
             LogLevelSave(1,"Personel güncelleme işleminde telefon numarası alanına uygun girin.");
             throw new RuntimeException("Hata");

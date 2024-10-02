@@ -86,6 +86,20 @@ public class RentalManager implements IRentalService {
             LogLevelSave(1,"Kiralama ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
             throw new RuntimeException("Hata");
         }
+
+        List<Rental> rentals = rentalDao.findAll();
+        for(Rental rental1 : rentals){
+            if (rentalDTO.getStartTime().isAfter(rental1.getStartTime()) && rentalDTO.getStartTime().isBefore(rental1.getEndTime())) {
+                LogLevelSave(1, "Bu alan daha önce kiralanmış");
+                throw new RuntimeException("Hata");
+            }
+        }
+
+
+
+
+
+
         LogLevelSave(3,"Kiralama işlemi başarılı.");
         return rentalDao.save(rental);
     }

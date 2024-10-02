@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -80,6 +81,13 @@ public class UniversityManager implements IUniversityService {
             LogLevelSave(4,"Üniversite ekleme işleminde telefon numarasını alanını uıygun girin");
             throw  new RuntimeException("hata");
         }
+        List<University> universities = universityDao.findAll();
+        for (University university: universities){
+            if(Objects.equals(university.getmail(), universityDTO.getMail())){
+                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
 
         LogLevelSave(3,"Üniversite ekleme işlemi başarılı");
         return universityDao.save(dtoToEntity(universityDTO));
@@ -95,6 +103,13 @@ public class UniversityManager implements IUniversityService {
         if (universityDTO.getName() == "" || universityDTO.getPhoneNumber() == "" || universityDTO.getCity() == "" || universityDTO.getMail() == ""){
             LogLevelSave(4,"Üniversite güncelleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Üniversite güncelleme işleminde boş alan bırakılamaz. " + id);
+        }
+        List<University> universities = universityDao.findAll();
+        for (University university: universities){
+            if(Objects.equals(university.getmail(), universityDTO.getMail()) && Objects.equals(university.getId(),id)){
+                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
         }
         editUniversity.setName(universityDTO.getName());
         editUniversity.setcity(universityDTO.getCity());

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -83,6 +84,23 @@ public class ManagerManager implements IManagerService {
             LogLevelSave(1,"Yönetici ekleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }
+        if(!(managerDTO.getPhoneNumber().length() == 11 && managerDTO.getPhoneNumber().startsWith("0"))){
+            LogLevelSave(4,"Telefon numarası alanını uygun girin");
+            throw new RuntimeException("hata");
+        }
+        List<Manager> managers = managerDao.findAll();
+        for (Manager manager: managers){
+            if(Objects.equals(manager.getMail(), managerDTO.getMail())){
+                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+        for (Manager manager: managers){
+            if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber())){
+                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
         LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
         return managerDao.save(dtoToEntity(managerDTO));
     }
@@ -92,6 +110,19 @@ public class ManagerManager implements IManagerService {
                             LogLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
                             return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                         });
+        List<Manager> managers = managerDao.findAll();
+        for (Manager manager: managers){
+            if(Objects.equals(manager.getMail(), managerDTO.getMail()) && !Objects.equals(manager.getId(),id)){
+                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
+        for (Manager manager: managers){
+            if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber()) && !Objects.equals(manager.getId(),id)){
+                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
         if (managerDTO.getName()=="" || managerDTO.getMail()=="" || managerDTO.getPhoneNumber()=="" || managerDTO.getSalary() == 0 || managerDTO.getSurName() == "" || managerDTO.getTitle()==""){
             LogLevelSave(1,"Yönetici güncelleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");

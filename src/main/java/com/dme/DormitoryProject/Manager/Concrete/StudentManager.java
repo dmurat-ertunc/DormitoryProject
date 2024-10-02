@@ -93,6 +93,12 @@ public class StudentManager implements IStudentService{
                 throw new RuntimeException("hata");
             }
         }
+        for (Student student: students){
+            if(Objects.equals(student.getMail(), studentDTO.getMail())){
+                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
+                throw new RuntimeException("hata");
+            }
+        }
         studentDTO.setVerify(false);
         LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
         return studentDao.save(dtoToEntity(studentDTO));
