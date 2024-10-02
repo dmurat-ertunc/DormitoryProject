@@ -118,14 +118,14 @@ public class StaffManager implements IStaffService {
             LogLevelSave(1,"Personel güncelleme işleminde, ilişki olacağı tablo kaldırılmış.");
             throw new RuntimeException("Hata");
         }
-        editStaff.setName(staff.getName());
-        editStaff.setMail(staff.getMail());
-        editStaff.setPhoneNumber(staff.getPhoneNumber());
-        editStaff.setSalary(staff.getSalary());
-        editStaff.setSurName(staff.getSurName());
-        editStaff.setDepartment(staff.getDepartment());
-        editStaff.setManager(staff.getManager());
-        editStaff.setTitle(staff.getTitle());
+        editStaff.setName(staffDTO.getName());
+        editStaff.setMail(staffDTO.getMail());
+        editStaff.setPhoneNumber(staffDTO.getPhoneNumber());
+        editStaff.setSalary(staffDTO.getSalary());
+        editStaff.setSurName(staffDTO.getSurName());
+        editStaff.setDepartment(departmentDao.getById(staffDTO.getDepartmentId()));
+        editStaff.setManager(managerDao.getById(staffDTO.getManagerId()));
+        editStaff.setTitle(titleDao.getById(staffDTO.getTitleId()));
         LogLevelSave(3,"Personel güncelleme işlemi başarılı.");
         return staffDao.save(editStaff);
     }
