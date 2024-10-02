@@ -47,7 +47,8 @@ public class StaffMapper {
         staff.setSalary(staffDTO.getSalary());
         staff.setSurName(staffDTO.getSurName());
         staff.setDepartment(departmentDao.getById(staffDTO.getDepartmentId()));
-        //staff.setDepartment(departmentDao.findById(staffDTO.getDepartmentId()));
+        staff.setTitle(titleDao.getById(staffDTO.getTitleId()));
+        staff.setManager(managerDao.getById(staffDTO.getTitleId()));
 
         return staff;
     }

@@ -87,11 +87,12 @@ public class StaffManager implements IStaffService {
             LogLevelSave(1,"Personel ekleme işleminde telefon numarası alanına uygun girin.");
             throw new RuntimeException("Hata");
         }
-        Staff staff = dtoToEntity(staffDTO); // staffların bağlanacığı tablolar var mı yok mu kontrolü için dto entitiye çevrildi
-//        if (staff.getDepartment().getIsDeleted() || staff.getTitle().getIsDeleted() || staff.getManager().getIsDeleted()){
-//            LogLevelSave(1,"Personel ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
-//            throw new RuntimeException("Hata");
-//        }
+        Staff staff = dtoToEntity(staffDTO);
+        // staffların bağlanacığı tablolar var mı yok mu kontrolü için dto entitiye çevrildi
+        if (staff.getDepartment().getIsDeleted() || staff.getTitle().getIsDeleted() || staff.getManager().getIsDeleted()){
+            LogLevelSave(1,"Personel ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
+            throw new RuntimeException("Hata");
+        }
         LogLevelSave(3,"Personel ekleme işlemi başarılı.");
         return staffDao.save(staff);
     }
