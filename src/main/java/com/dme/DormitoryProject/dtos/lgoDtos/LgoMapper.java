@@ -7,6 +7,7 @@ public class LgoMapper {
     public static LgoDTO toDTO(Lgo lgo){
         LgoDTO lgoDTO = new LgoDTO();
 
+        lgoDTO.setId(lgo.getId());
         lgoDTO.setMessage(lgo.getMessage());
         lgoDTO.setLogLeveId(lgo.getLogLevel().getId());
         lgoDTO.setLogLevelDescription(lgo.getLogLevel().getDescription());
