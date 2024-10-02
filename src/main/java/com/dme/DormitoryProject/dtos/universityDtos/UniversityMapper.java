@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class UniversityMapper {
     public static UniversityDTO toDTO(University university) {
         UniversityDTO dto = new UniversityDTO();
+        dto.setId(university.getId());
         dto.setName(university.getName());
         dto.setMail(university.getmail());
         dto.setPhoneNumber(university.getphoneNumber());

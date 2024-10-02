@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class StudentDTO {
+    private Long id;
     private String name;
     private String surName;
     private String tcNo;
@@ -12,6 +13,14 @@ public class StudentDTO {
     private LocalDate birthDate;
     private Set<Long> universityIds = new HashSet<>(); // Üniversite ID'leri
     private boolean verify;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

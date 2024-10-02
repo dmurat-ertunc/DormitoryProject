@@ -4,12 +4,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UniversityDTO {
+    private Long id;
     private String name;
     private String mail;
     private String phoneNumber;
     private String city;
     private String studentName;
     private Set<Long> studentIds = new HashSet<>(); // Öğrenci ID'leri
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getStudentName() {
         return studentName;

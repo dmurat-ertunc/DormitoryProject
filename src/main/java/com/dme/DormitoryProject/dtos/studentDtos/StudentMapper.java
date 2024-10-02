@@ -17,6 +17,7 @@ public class StudentMapper {
         }
 
         StudentDTO dto = new StudentDTO();
+        dto.setId(student.getId());
         dto.setName(student.getName());
         dto.setSurName(student.getSurName());
         dto.setTcNo(student.getTcNo());
