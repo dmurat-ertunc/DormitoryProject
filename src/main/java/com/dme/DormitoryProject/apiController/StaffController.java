@@ -31,8 +31,8 @@ public class StaffController {
         return this.staffService.saveStaff(staffDTO);
     }
     @PutMapping("update/{id}")
-    public Staff updateStaff(@PathVariable Long id,@RequestBody Staff staff){
-        return this.staffService.updateStaff(id,staff);
+    public Staff updateStaff(@PathVariable Long id,@RequestBody StaffDTO staffDTO){
+        return this.staffService.updateStaff(id,staffDTO);
     }
     @PutMapping("delete/{id}")
     public  Staff deleteStaff(@PathVariable Long id){

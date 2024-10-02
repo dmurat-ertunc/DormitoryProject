@@ -11,5 +11,5 @@ public interface IStaffService {
     Optional<StaffDTO> getById(Long id);
     Staff saveStaff(StaffDTO staffDTO);
     Staff deleteStaff(Long id);
-    Staff updateStaff(Long id, Staff staff);
+    Staff updateStaff(Long id, StaffDTO staffDTO);
 }

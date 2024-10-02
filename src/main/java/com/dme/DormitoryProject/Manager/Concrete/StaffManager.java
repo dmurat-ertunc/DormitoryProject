@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.rmi.registry.LocateRegistry;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class StaffManager implements IStaffService {
@@ -98,22 +95,25 @@ public class StaffManager implements IStaffService {
     }
 
     @Override
-    public Staff updateStaff(Long id, Staff staff){
+    public Staff updateStaff(Long id, StaffDTO staffDTO){
         Staff editStaff = staffDao.findById(id)
                 .orElseThrow(() ->{
                     LogLevelSave(1,"Bu id değerine ait bir personel bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
 
-        if (staff.getName()=="" || staff.getMail()=="" || staff.getPhoneNumber()=="" || staff.getSalary() == 0
-                || staff.getSurName() == "" || staff.getDepartment() == null || staff.getTitle() == null || staff.getManager() == null){
+        if (Objects.equals(staffDTO.getName(), "") || Objects.equals(staffDTO.getMail(), "") || Objects.equals(staffDTO.getPhoneNumber(), "") || staffDTO.getSalary() == 0
+                || Objects.equals(staffDTO.getSurName(), "")){
             LogLevelSave(1,"Personel güncelleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }
-        if (!(staff.getPhoneNumber().length() == 11 && staff.getPhoneNumber().startsWith("0"))) {
+
+        if (!(staffDTO.getPhoneNumber().length() == 11 && staffDTO.getPhoneNumber().startsWith("0"))) {
             LogLevelSave(1,"Personel güncelleme işleminde telefon numarası alanına uygun girin.");
             throw new RuntimeException("Hata");
         }
+
+        Staff staff = dtoToEntity(staffDTO);
         if (staff.getDepartment().getIsDeleted() || staff.getTitle().getIsDeleted() || staff.getManager().getIsDeleted()){
             LogLevelSave(1,"Personel güncelleme işleminde, ilişki olacağı tablo kaldırılmış.");
             throw new RuntimeException("Hata");
