@@ -1,7 +1,16 @@
 package com.dme.DormitoryProject.dtos.logLevelDtos;
 
 public class LogLevelDTO {
+    private Long id;
     private String description;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getDescription() {
         return description;

@@ -1,8 +1,13 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import com.dme.DormitoryProject.Manager.Abstract.ILogLevelService;
+import com.dme.DormitoryProject.dtos.logLevelDtos.LogLevelDTO;
+import com.dme.DormitoryProject.dtos.logLevelDtos.LogLevelMapper;
+import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
+import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.Lgo;
 import com.dme.DormitoryProject.entity.LogLevel;
+import com.dme.DormitoryProject.entity.Manager;
 import com.dme.DormitoryProject.entity.Staff;
 import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
@@ -11,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,43 +43,57 @@ public class LogLevelManager implements ILogLevelService {
         log.setMessage(message);
         lgoDao.save(log);
     }
+    public List<LogLevelDTO> entityToDto(List<LogLevel> logLevels){
+        List<LogLevelDTO> logLevelDTOS = new ArrayList<>();
 
+        for (LogLevel logLevel : logLevels) {
+            LogLevelDTO dto = LogLevelMapper.toDTO(logLevel);
+            logLevelDTOS.add(dto);
+        }
+        return logLevelDTOS;
+    }
+
+    public LogLevel dtoToEntity(LogLevelDTO logLevelDTO){
+        return LogLevelMapper.toEntity(logLevelDTO);
+    }
     @Override
-    public List<LogLevel> getAll(){
+    public List<LogLevelDTO> getAll(){
+        List<LogLevel> logLevel = logLevelDao.findAll();
         LogLevelSave(2,"Tüm log açıklamaları listelendi");
-        return logLevelDao.findAll();
+        return entityToDto(logLevel);
     }
 
     @Override
-    public Optional<LogLevel> getById(Long id){
-        Optional<LogLevel> logLevel = logLevelDao.findById(id);
-        LogLevelSave(2,"Id değerine göre log açıklaması listelendi");
-        return logLevel;
-    }
+    public Optional<LogLevelDTO> getById(Long id){
+        List<LogLevelDTO> logLevelDTOS = entityToDto(logLevelDao.findAll());
+        LogLevelSave(2, "Id değerine göre yönetici listelendi");
+        return logLevelDTOS.stream()
+                .filter(dto -> dto.getId().equals(id))
+                .findFirst();
+        }
 
     @Override
-    public LogLevel saveLogLevel(LogLevel logLevel){
-        if(logLevel.getDescription() == ""){
+    public LogLevel saveLogLevel(LogLevelDTO logLevelDTO){
+        if(Objects.equals(logLevelDTO.getDescription(), "") || Objects.equals(logLevelDTO.getDescription(), null)){
             LogLevelSave(3,"Log açıklaması tablosunda boşluk bırakılamaz");
             throw new RuntimeException("hata");
         }
-        logLevel.setAddDate(getMomentDate());
         LogLevelSave(3,"Log açıklaması tablosuna ekleme işlemi başarılı");
-        return logLevelDao.save(logLevel);
+        return logLevelDao.save(dtoToEntity(logLevelDTO));
     }
 
     @Override
-    public LogLevel updateLogLevel(Long id, LogLevel logLevel){
+    public LogLevel updateLogLevel(Long id, LogLevelDTO logLevelDTO){
         LogLevel updateLoglevel = logLevelDao.findById(id)
                 .orElseThrow(() -> {
                    LogLevelSave(4,"Bu id değerine ait Log açıklaması bulunamadı.");
                    return new RuntimeException("hata");
                 });
-        if(logLevel.getDescription() == ""){
+        if(Objects.equals(logLevelDTO.getDescription(), "") || Objects.equals(logLevelDTO.getDescription(), null)){
             LogLevelSave(1,"Log açıklama tablosunda, güncelleme işlemi için boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
-        updateLoglevel.setDescription(logLevel.getDescription());
+        updateLoglevel.setDescription(logLevelDTO.getDescription());
         LogLevelSave(3,"Log açıklaması tablosunda güncelleme başarılı");
         return logLevelDao.save(updateLoglevel);
     }

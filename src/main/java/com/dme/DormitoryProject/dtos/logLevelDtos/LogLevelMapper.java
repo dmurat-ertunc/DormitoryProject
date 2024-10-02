@@ -13,6 +13,7 @@ public class LogLevelMapper {
     public static LogLevelDTO toDTO(LogLevel logLevel){
         LogLevelDTO logLevelDTO = new LogLevelDTO();
 
+        logLevelDTO.setId(logLevel.getId());
         logLevelDTO.setDescription(logLevel.getDescription());
 
         return logLevelDTO;

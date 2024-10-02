@@ -1,6 +1,7 @@
 package com.dme.DormitoryProject.apiController;
 
 import com.dme.DormitoryProject.Manager.Abstract.ILogLevelService;
+import com.dme.DormitoryProject.dtos.logLevelDtos.LogLevelDTO;
 import com.dme.DormitoryProject.entity.LogLevel;
 import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,22 +21,22 @@ public class LogLevelController {
     }
 
     @GetMapping("getAll")
-    public List<LogLevel> getAll(){
+    public List<LogLevelDTO> getAll(){
         return this.logLevelService.getAll();
     }
 
     @GetMapping("logLevelId/{id}")
-    public Optional<LogLevel> getById(@PathVariable Long id){
+    public Optional<LogLevelDTO> getById(@PathVariable Long id){
         return this.logLevelService.getById(id);
     }
 
     @PostMapping("saveLogLevel")
-    public LogLevel saveLogLevel(@RequestBody LogLevel logLevel){
-        return this.logLevelService.saveLogLevel(logLevel);
+    public LogLevel saveLogLevel(@RequestBody LogLevelDTO logLevelDTO){
+        return this.logLevelService.saveLogLevel(logLevelDTO);
     }
     @PutMapping("update/{id}")
-    public LogLevel updateLogLevel(@PathVariable Long id, @RequestBody LogLevel logLevel){
-        return this.logLevelService.updateLogLevel(id,logLevel);
+    public LogLevel updateLogLevel(@PathVariable Long id, @RequestBody LogLevelDTO logLevelDTO){
+        return this.logLevelService.updateLogLevel(id,logLevelDTO);
     }
     @PutMapping("delete/{id}")
     public LogLevel deleteLogLevel(@PathVariable Long id){
