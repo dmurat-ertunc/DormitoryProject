@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -89,15 +90,13 @@ public class RentalManager implements IRentalService {
 
         List<Rental> rentals = rentalDao.findAll();
         for(Rental rental1 : rentals){
-            if (rentalDTO.getStartTime().isAfter(rental1.getStartTime()) && rentalDTO.getStartTime().isBefore(rental1.getEndTime())) {
+            if (rentalDTO.getStartTime().isAfter(rental1.getStartTime())
+                    && rentalDTO.getStartTime().isBefore(rental1.getEndTime())
+                    && Objects.equals(rentalDTO.getRentalDate(),rental1.getRentalDate())) {
                 LogLevelSave(1, "Bu alan daha önce kiralanmış");
                 throw new RuntimeException("Hata");
             }
         }
-
-
-
-
 
 
         LogLevelSave(3,"Kiralama işlemi başarılı.");
