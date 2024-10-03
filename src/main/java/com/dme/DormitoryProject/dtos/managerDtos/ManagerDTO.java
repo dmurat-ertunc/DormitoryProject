@@ -1,5 +1,9 @@
 package com.dme.DormitoryProject.dtos.managerDtos;
 
+import com.dme.DormitoryProject.Annotations.MailCheck;
+
+import javax.validation.constraints.Size;
+
 public class ManagerDTO {
     private String mail;
     private String name;

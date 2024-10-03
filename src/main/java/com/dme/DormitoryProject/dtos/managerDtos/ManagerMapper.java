@@ -3,7 +3,7 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 import com.dme.DormitoryProject.entity.Manager;
 
 public class ManagerMapper {
-    public static ManagerDTO toDTO(Manager manager){
+    public ManagerDTO toDTO(Manager manager){
         ManagerDTO managerDTO = new ManagerDTO();
 
         managerDTO.setId(manager.getId());

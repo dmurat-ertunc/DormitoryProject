@@ -1,9 +1,7 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
-import com.dme.DormitoryProject.Manager.Abstract.ILgoService;
+import com.dme.DormitoryProject.Annotations.MailCheck;
 import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
-import com.dme.DormitoryProject.dtos.departmentDtos.DepartmentDTO;
-import com.dme.DormitoryProject.dtos.departmentDtos.DepartmentMapper;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.*;
@@ -11,10 +9,8 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IManagerDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
-import org.hibernate.sql.ast.tree.expression.Over;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -54,8 +50,8 @@ public class ManagerManager implements IManagerService {
         List<ManagerDTO> managerDTOS = new ArrayList<>();
 
         for (Manager manager : managers) {
-            ManagerDTO dto = ManagerMapper.toDTO(manager);
-            managerDTOS.add(dto);
+            //ManagerDTO dto = ManagerMapper.toDTO(manager);
+            //managerDTOS.add(dto);
         }
         return managerDTOS;
     }
@@ -78,9 +74,10 @@ public class ManagerManager implements IManagerService {
                 .filter(dto -> dto.getId().equals(id))
                 .findFirst();
     }
+
     @Override
     public Manager saveManager(ManagerDTO managerDTO){
-        if (managerDTO.getName()=="" || managerDTO.getMail()=="" || managerDTO.getPhoneNumber()=="" || managerDTO.getSalary() == 0 || managerDTO.getSurName() == "" || managerDTO.getTitle()==""){
+        if (managerDTO.getName()==null || managerDTO.getMail()==null || managerDTO.getPhoneNumber()==null || managerDTO.getSalary() == 0 || managerDTO.getSurName() == null || managerDTO.getTitle()==null){
             LogLevelSave(1,"Yönetici ekleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }
@@ -88,20 +85,21 @@ public class ManagerManager implements IManagerService {
             LogLevelSave(4,"Telefon numarası alanını uygun girin");
             throw new RuntimeException("hata");
         }
-        List<Manager> managers = managerDao.findAll();
-        for (Manager manager: managers){
-            if(Objects.equals(manager.getMail(), managerDTO.getMail())){
-                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        for (Manager manager: managers){
-            if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber())){
-                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
+        //List<Manager> managers = managerDao.findAll();
+        //for (Manager manager: managers){
+        //    if(Objects.equals(manager.getMail(), managerDTO.getMail())){
+        //        LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
+        //        throw new RuntimeException("hata");
+        //    }
+        //}
+        //for (Manager manager: managers){
+        //    if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber())){
+        //        LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
+        //        throw new RuntimeException("hata");
+        //   }
+        //}
+
+            LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
         return managerDao.save(dtoToEntity(managerDTO));
     }
     public Manager updateManager(Long id, ManagerDTO managerDTO){

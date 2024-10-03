@@ -1,5 +1,6 @@
 package com.dme.DormitoryProject.entity;
 
+import com.dme.DormitoryProject.Annotations.MailCheck;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -10,6 +11,7 @@ public class Manager extends BaseEntity{
 
     private String name;
     private String surName;
+    @MailCheck
     private String mail;
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Staff> staffList;
