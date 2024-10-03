@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -77,6 +79,8 @@ public class StudentManager implements IStudentService{
 
     @Override
     public Student saveStudent(StudentDTO studentDTO){
+        List<Student> students = studentDao.findAll();
+        control(students,studentDTO,"getTcNo");
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci ekleme işleminde boş alan bırakılamaz");
             throw new RuntimeException("hata");
@@ -85,7 +89,6 @@ public class StudentManager implements IStudentService{
             LogLevelSave(4,"Öğrenci ekleme işleminde TC kimlik numarısını uygun giriniz");
             throw new RuntimeException("hata");
         }
-        List<Student> students = studentDao.findAll();
 
         for (Student student: students){
             if(Objects.equals(student.getTcNo(), studentDTO.getTcNo())){
@@ -99,6 +102,7 @@ public class StudentManager implements IStudentService{
                 throw new RuntimeException("hata");
             }
         }
+
         studentDTO.setVerify(false);
         LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
         return studentDao.save(dtoToEntity(studentDTO));
@@ -163,6 +167,34 @@ public class StudentManager implements IStudentService{
             }
         }
         return false;
+    }
+    public boolean control(List<Student> students,StudentDTO studentDTO,String metot){
+        try {
+            // StudentDTO nesnesindeki ilgili metodu çağırarak değeri al
+            Method dtoMethod = studentDTO.getClass().getMethod(metot);
+            Object dtoValue = dtoMethod.invoke(studentDTO);
+
+            // Öğrencilerin listesi üzerinde döngü
+            for (Student student : students) {
+                // Student nesnesindeki ilgili metodu çağırarak değeri al
+                Method studentMethod = student.getClass().getMethod(metot);
+                Object studentValue = studentMethod.invoke(student);
+
+                // Eğer değerler eşitse
+                if (studentValue.equals(dtoValue)) {
+                    System.out.println("Aynı " + metot + " değerine sahip öğrenci bulundu: " + studentValue);
+                    return false; // Eşleşme varsa false döndür
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            System.err.println("Belirtilen metot bulunamadı: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return true; //
     }
 
     @Override

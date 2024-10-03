@@ -3,6 +3,7 @@ package com.dme.DormitoryProject.entity;
 import com.dme.DormitoryProject.Annotations.MailCheck;
 import jakarta.persistence.*;
 
+import javax.validation.constraints.Email;
 import java.util.List;
 
 @Entity
