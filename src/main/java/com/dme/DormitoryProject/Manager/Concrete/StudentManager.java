@@ -81,6 +81,7 @@ public class StudentManager implements IStudentService{
     public Student saveStudent(StudentDTO studentDTO){
         List<Student> students = studentDao.findAll();
         control(students,studentDTO,"getTcNo");
+        control(students,studentDTO,"getMail");
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci ekleme işleminde boş alan bırakılamaz");
             throw new RuntimeException("hata");
@@ -115,6 +116,10 @@ public class StudentManager implements IStudentService{
                     LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
+        List<Student> students = studentDao.findAll();
+        students.remove(editStudent);
+        control(students,studentDTO,"getTcNo");
+        control(students,studentDTO,"getMail");
 
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci güncelleme işleminde boş alan bırakılamaz");
@@ -124,20 +129,13 @@ public class StudentManager implements IStudentService{
             LogLevelSave(4,"Öğrenci güncelleme işleminde TC kimlik numarısını uygun giriniz");
             throw new RuntimeException("hata");
         }
-        List<Student> students = studentDao.findAll();
-
-        //for (Student student: students){
-        //    if(Objects.equals(student.getTcNo(), studentDTO.getTcNo()) && !Objects.equals(student.getId(),id)){
-        //        LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
-        //        throw new RuntimeException("hata");
-        //    }
         editStudent.setName(studentDTO.getName());
         editStudent.setTcNo(studentDTO.getTcNo());
         editStudent.setBirthDate(studentDTO.getBirthDate());
         editStudent.setSurName(studentDTO.getSurName());
         editStudent.setMail(studentDTO.getMail());
         LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
-        return studentDao.save(editStudent);
+            return studentDao.save(editStudent);
     }
 
 
