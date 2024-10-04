@@ -77,7 +77,7 @@ public class ManagerManager implements IManagerService {
 
     @Override
     public Manager saveManager(ManagerDTO managerDTO){
-        if (managerDTO.getName()==null || managerDTO.getMail()==null || managerDTO.getPhoneNumber()==null || managerDTO.getSalary() == 0 || managerDTO.getSurName() == null || managerDTO.getTitle()==null){
+        if (managerDTO.getName()==null || managerDTO.getPhoneNumber()==null || managerDTO.getSalary() == 0 || managerDTO.getSurName() == null || managerDTO.getTitle()==null){
             LogLevelSave(1,"Yönetici ekleme işleminde boş alan bırakılamaz.");
             throw new RuntimeException("Hata");
         }

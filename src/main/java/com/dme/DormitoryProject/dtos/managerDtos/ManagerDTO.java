@@ -2,9 +2,11 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 
 import com.dme.DormitoryProject.Annotations.MailCheck;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class ManagerDTO {
+    @NotNull
     private String mail;
     private String name;
     private String surName;
