@@ -80,8 +80,10 @@ public class StudentManager implements IStudentService{
     @Override
     public Student saveStudent(StudentDTO studentDTO){
         List<Student> students = studentDao.findAll();
-        control(students,studentDTO,"getTcNo");
-        control(students,studentDTO,"getMail");
+
+        if (control(students,studentDTO,"getMail") && control(students,studentDTO,"getTcNo")){
+            throw new RuntimeException("hata");
+        }
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci ekleme işleminde boş alan bırakılamaz");
             throw new RuntimeException("hata");
@@ -90,20 +92,6 @@ public class StudentManager implements IStudentService{
             LogLevelSave(4,"Öğrenci ekleme işleminde TC kimlik numarısını uygun giriniz");
             throw new RuntimeException("hata");
         }
-
-        for (Student student: students){
-            if(Objects.equals(student.getTcNo(), studentDTO.getTcNo())){
-                LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        for (Student student: students){
-            if(Objects.equals(student.getMail(), studentDTO.getMail())){
-                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-
         studentDTO.setVerify(false);
         LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
         return studentDao.save(dtoToEntity(studentDTO));
@@ -118,8 +106,9 @@ public class StudentManager implements IStudentService{
                 });
         List<Student> students = studentDao.findAll();
         students.remove(editStudent);
-        control(students,studentDTO,"getTcNo");
-        control(students,studentDTO,"getMail");
+        if (control(students,studentDTO,"getTcNo") &&  control(students,studentDTO,"getTcNo")){
+            throw  new RuntimeException("hata");
+        }
 
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
             LogLevelSave(4,"Öğrenci güncelleme işleminde boş alan bırakılamaz");
@@ -149,7 +138,7 @@ public class StudentManager implements IStudentService{
                 Object studentValue = studentMethod.invoke(student);
                 if (studentValue.equals(dtoValue)) {
                     LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
-                    return false; // Eşleşme varsa false döndür
+                    return false;
                 }
             }
         } catch (NoSuchMethodException e) {
