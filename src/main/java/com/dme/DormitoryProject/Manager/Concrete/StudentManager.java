@@ -131,8 +131,6 @@ public class StudentManager implements IStudentService{
         //        LogLevelSave(4,"Bu kimlik numarasına ait öğrenci zaten mevcuttur");
         //        throw new RuntimeException("hata");
         //    }
-        //}
-        checkStudent(3L,studentDTO);
         editStudent.setName(studentDTO.getName());
         editStudent.setTcNo(studentDTO.getTcNo());
         editStudent.setBirthDate(studentDTO.getBirthDate());
@@ -142,47 +140,17 @@ public class StudentManager implements IStudentService{
         return studentDao.save(editStudent);
     }
 
-    public Map<String, Object> checkStudent(Long id, StudentDTO studentDTO){
-        Map<String, Object> responseMap = new HashMap<>();
-        List<Student> studentList = studentDao.findAll();
-        Student editStudent = studentDao.getById(id);
-        studentList.remove(editStudent);
-        checkField(editStudent, studentList, studentDTO);
-        return responseMap;
-    }
 
-    public Boolean checkField(Student editStudent, List<Student> studentList, StudentDTO studentDTO){
-        Class<?> clazz = editStudent.getClass();
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            field.setAccessible(true); // Özel alanlara erişmek için gerekli
-            try {
-                Object value = field.get(editStudent); // Alanın değeri
-                    System.out.println(field.getName() + ": " + value); // Alan adı ve değeri yazdır
-                if(Objects.equals(field.getName(), studentDTO)){
-
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace(); // Alan değerine erişimde hata olursa yakala
-            }
-        }
-        return false;
-    }
     public boolean control(List<Student> students,StudentDTO studentDTO,String metot){
         try {
             // StudentDTO nesnesindeki ilgili metodu çağırarak değeri al
             Method dtoMethod = studentDTO.getClass().getMethod(metot);
             Object dtoValue = dtoMethod.invoke(studentDTO);
-
-            // Öğrencilerin listesi üzerinde döngü
             for (Student student : students) {
-                // Student nesnesindeki ilgili metodu çağırarak değeri al
                 Method studentMethod = student.getClass().getMethod(metot);
                 Object studentValue = studentMethod.invoke(student);
-
-                // Eğer değerler eşitse
                 if (studentValue.equals(dtoValue)) {
-                    System.out.println("Aynı " + metot + " değerine sahip öğrenci bulundu: " + studentValue);
+                    LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
                     return false; // Eşleşme varsa false döndür
                 }
             }
@@ -193,8 +161,7 @@ public class StudentManager implements IStudentService{
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-
-        return true; //
+        return true;
     }
 
     @Override
