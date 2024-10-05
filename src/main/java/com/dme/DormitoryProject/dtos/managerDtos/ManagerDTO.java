@@ -1,12 +1,11 @@
 package com.dme.DormitoryProject.dtos.managerDtos;
 
-import com.dme.DormitoryProject.Annotations.MailCheck;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 public class ManagerDTO {
-    @NotNull
+    @NotEmpty(message = "mail boş kalamaz")
     private String mail;
     private String name;
     private String surName;
@@ -18,7 +17,6 @@ public class ManagerDTO {
     public ManagerDTO(){
 
     }
-
     public ManagerDTO(String mail, String name, String surName, String phoneNumber, int salary, String title, Long id) {
         this.mail = mail;
         this.name = name;
@@ -35,12 +33,12 @@ public class ManagerDTO {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getMail() {
-        return mail;
-    }
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+    public String getMail() {
+        return mail;
     }
 
     public String getName() {

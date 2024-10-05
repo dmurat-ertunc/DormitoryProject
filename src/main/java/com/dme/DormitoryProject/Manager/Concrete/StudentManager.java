@@ -81,7 +81,7 @@ public class StudentManager implements IStudentService{
     public Student saveStudent(StudentDTO studentDTO){
         List<Student> students = studentDao.findAll();
 
-        if (control(students,studentDTO,"getMail") && control(students,studentDTO,"getTcNo")){
+        if (control(students,studentDTO,"getMail") || control(students,studentDTO,"getTcNo")){
             throw new RuntimeException("hata");
         }
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
@@ -106,12 +106,12 @@ public class StudentManager implements IStudentService{
                 });
         List<Student> students = studentDao.findAll();
         students.remove(editStudent);
-        if (control(students,studentDTO,"getTcNo") &&  control(students,studentDTO,"getTcNo")){
+        if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getTcNo")){
             throw  new RuntimeException("hata");
         }
 
         if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
-            LogLevelSave(4,"Öğrenci güncelleme işleminde boş alan bırakılamaz");
+            LogLevelSave(4,"Öğrenci güncelleme işleminded boş alan bırakılamaz");
             throw new RuntimeException("hata");
         }
         if(!(studentDTO.getTcNo().length() == 11)){
@@ -138,17 +138,15 @@ public class StudentManager implements IStudentService{
                 Object studentValue = studentMethod.invoke(student);
                 if (studentValue.equals(dtoValue)) {
                     LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
-                    return false;
+                    return true;
                 }
             }
         } catch (NoSuchMethodException e) {
             System.err.println("Belirtilen metot bulunamadı: " + e.getMessage());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
-        return true;
+        return false;
     }
 
     @Override

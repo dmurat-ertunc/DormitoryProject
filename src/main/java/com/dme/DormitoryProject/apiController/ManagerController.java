@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ public class ManagerController {
         return this.managerService.getById(id);
     }
     @PostMapping("saveManager")
-    public Manager saveManager(@Valid @RequestBody ManagerDTO managerDTO){
+    public Manager saveManager(@RequestBody @Valid ManagerDTO managerDTO){
         return this.managerService.saveManager(managerDTO);
     }
     @PutMapping("update/{id}")

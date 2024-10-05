@@ -1,11 +1,8 @@
 package com.dme.DormitoryProject.entity;
 
-import com.dme.DormitoryProject.Annotations.MailCheck;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -14,7 +11,6 @@ public class Manager extends BaseEntity{
 
     private String name;
     private String surName;
-    @NotNull
     private String mail;
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Staff> staffList;

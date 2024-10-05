@@ -1,6 +1,5 @@
 package com.dme.DormitoryProject.dtos.studentDtos;
 
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;

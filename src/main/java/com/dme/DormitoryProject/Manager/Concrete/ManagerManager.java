@@ -1,6 +1,6 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
-import com.dme.DormitoryProject.Annotations.MailCheck;
+
 import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
