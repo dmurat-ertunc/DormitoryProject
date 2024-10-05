@@ -106,7 +106,7 @@ public class StudentManager implements IStudentService{
                 });
         List<Student> students = studentDao.findAll();
         students.remove(editStudent);
-        if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getTcNo")){
+        if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getMail")){
             throw  new RuntimeException("hata");
         }
 

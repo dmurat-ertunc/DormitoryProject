@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class ManagerDTO {
-    @NotEmpty(message = "mail boş kalamaz")
+    @NotEmpty(message = "mail boş kalamaz mla")
+    @NotNull(message = "mail boş kalamaz")
     private String mail;
     private String name;
     private String surName;
