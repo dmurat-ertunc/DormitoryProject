@@ -4,6 +4,7 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 import com.dme.DormitoryProject.annotations.MailUniqueCheck;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public class ManagerDTO {
     @NotEmpty(message = "mail boş kalamaz mla")
@@ -12,6 +13,8 @@ public class ManagerDTO {
     private String mail;
     private String name;
     private String surName;
+    @Pattern(regexp = "^[0-9]+$", message = "Sadece rakam içermelidir.")
+    @Pattern(regexp = "^0\\d{10}$", message = "Telefon numarası 0 ile başlamalı ve 11 karakter olmalıdır.")
     private String phoneNumber;
     private int salary;
     private String title;
