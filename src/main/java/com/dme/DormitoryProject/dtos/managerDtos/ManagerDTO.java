@@ -1,12 +1,14 @@
 package com.dme.DormitoryProject.dtos.managerDtos;
 
 
+import com.dme.DormitoryProject.annotations.MailUniqueCheck;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class ManagerDTO {
     @NotEmpty(message = "mail boş kalamaz mla")
     @NotNull(message = "mail boş kalamaz")
+    @MailUniqueCheck
     private String mail;
     private String name;
     private String surName;
