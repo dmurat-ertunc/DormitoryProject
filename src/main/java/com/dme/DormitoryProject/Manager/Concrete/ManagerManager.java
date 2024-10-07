@@ -1,6 +1,5 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
-
 import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
@@ -17,10 +16,8 @@ import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.hibernate.action.internal.EntityActionVetoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ManagerManager implements IManagerService {
@@ -29,7 +26,6 @@ public class ManagerManager implements IManagerService {
     private ILogLevelDao logLevelDao;
     private IStaffDao staffDao;
     private GlobalExceptionHandler globalExceptionHandler;
-
     @Autowired
     public ManagerManager(IManagerDao managerDao, ILgoDao logDao,ILogLevelDao logLevelDao,IStaffDao staffDao,GlobalExceptionHandler globalExceptionHandler){
         this.managerDao=managerDao;
@@ -38,9 +34,6 @@ public class ManagerManager implements IManagerService {
         this.staffDao=staffDao;
         this.globalExceptionHandler=globalExceptionHandler;
     }
-
-
-
     public void LogLevelSave(long id,String message){
         Lgo log = new Lgo();
         long searchLogLevelId= id;
@@ -50,25 +43,20 @@ public class ManagerManager implements IManagerService {
         log.setMessage(message);
         logDao.save(log);
     }
-
     public List<ManagerDTO> entityToDtoList(List<Manager> managers){
         List<ManagerDTO> managerDTOS = new ArrayList<>();
-
         for (Manager manager : managers) {
             ManagerDTO dto = ManagerMapper.toDTO(manager);
             managerDTOS.add(dto);
         }
         return managerDTOS;
     }
-
     public ManagerDTO entityToDtoObject(Manager manager){
         return ManagerMapper.toDTO(manager);
     }
-
     public Manager dtoToEntity(ManagerDTO managerDTO){
         return ManagerMapper.toEntitiy(managerDTO);
     }
-
     @Override
     public Result getAll(){
         try {
@@ -86,19 +74,16 @@ public class ManagerManager implements IManagerService {
             Manager findManager = managerDao.getById(id);
             LogLevelSave(3,"İd değerine göre yönetici işlemi başarılı");
             return new SuccessDataResult("İd değerine göre yönetici verisi, başarılı bir şekilde döndürüldü",true, entityToDtoObject(findManager));
-
         } catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
             LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
             return new ErrorResult("Bu id değerine ait yönetici bulunamadı",false);
-
         }
     }
-
     @Override
     public Result saveManager(ManagerDTO managerDTO){
-        LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
         managerDao.save(dtoToEntity(managerDTO));
+        LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
         return new SuccessDataResult("Yönetici ekleme işlemi başarılı",true,managerDTO);
     }
     public Result updateManager(Long id, ManagerDTO managerDTO){
@@ -113,7 +98,7 @@ public class ManagerManager implements IManagerService {
             editManager.setTitle(managerDTO.getTitle());
             LogLevelSave(3,"Yöentici güncelleme işlemi başarılı");
             managerDao.save(editManager);
-            return new SuccessDataResult("Yönetici güncelleme  işlemi başarılı",true,editManager);
+            return new SuccessDataResult("Yönetici güncelleme  işlemi başarılı",true,entityToDtoObject(editManager));
         } catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
             LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");

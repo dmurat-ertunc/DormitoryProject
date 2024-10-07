@@ -10,6 +10,10 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
 import com.dme.DormitoryProject.repository.ITitleDao;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesEmptyResult;
+import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +44,11 @@ public class TitleManager implements ITitleService {
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         log.setDeleted(false);
         lgoDao.save(log);
     }
-    public List<TitleDTO> entityToDto(List<Title> titles){
+    public List<TitleDTO> entityToDtoList(List<Title> titles){
         List<TitleDTO> titleDTOS = new ArrayList<>();
 
         for (Title title : titles) {
@@ -54,60 +57,80 @@ public class TitleManager implements ITitleService {
         }
         return titleDTOS;
     }
+    public TitleDTO entityToDtoObject(Title title){
+        return TitleMapper.toDTO(title);
+    }
 
     public Title dtoToEntity(TitleDTO titleDTO){
         return TitleMapper.toEntity(titleDTO);
     }
     @Override
-    public List<TitleDTO> getAll(){
-        List<Title> titles = titleDao.findAll();
-        LogLevelSave(2,"Tüm ünvanlar listelendi");
-        return entityToDto(titles);
+    public Result getAll(){
+        try{
+            List<TitleDTO> titlesDto = entityToDtoList(titleDao.findAll());
+            LogLevelSave(3,"Tüm ünvanlar listelendi");
+            return new SuccessDataResult("Tüm ünvanlar listelendi",true,titlesDto);
+        }catch (Exception e){
+            return new ErrorResult("Ünvanların listeleme işleminde hata oluştu",false);
+        }
     }
     @Override
-    public Optional<TitleDTO> getById(Long id) {
-        List<TitleDTO> titleDTOS = entityToDto(titleDao.findAll());
-        LogLevelSave(2, "Id değerine göre ünvan listelendi");
-        return titleDTOS.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
+    public Result getById(Long id) {
+        try {
+            Title title = titleDao.getById(id);
+            LogLevelSave(3,"İd değerine göre ünvan listelendi");
+            return new SuccessDataResult("İd değerine göre ünvan listelendi",true,entityToDtoObject(title));
+        } catch (Exception e) {
+            LogLevelSave(1,"Bu id değerine ait bir ünvan bulunamadı.");
+            return new ErrorResult("Bu id değerine ait ünvan bulunamadı",false);
+        }
     }
     @Override
-    public Title saveTitle(TitleDTO titleDTO){
-        LogLevelSave(3,"Ünvan ekleme işlemi başarılı.");
-        return titleDao.save(dtoToEntity(titleDTO));
+    public Result saveTitle(TitleDTO titleDTO){
+        try {
+            titleDao.save(dtoToEntity(titleDTO));
+            LogLevelSave(3,"Ünvan ekleme işlemi başarılı");
+            return new SuccessDataResult("Ünvan ekleme işlemi başarılı",true,titleDTO);
+        } catch (Exception e) {
+            LogLevelSave(3,"Ünvan ekleme işlemi başarısız");
+            return new ErrorResult("Ünvan ekleme işlemi başarısız",false);
+        }
 
     }
     @Override
-    public Title updateTitle(Long id, TitleDTO titleDTO) {
-        Title editTitle = titleDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir ünvan bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        editTitle.setName(titleDTO.getName());
-        LogLevelSave(3,"ünvan güncelleme işlemi başarılı.");
-        return titleDao.save(editTitle);
+    public Result updateTitle(Long id, TitleDTO titleDTO) {
+        Title editTitle;
+        try {
+            editTitle = titleDao.getById(id);
+            editTitle.setName(titleDTO.getName());
+            titleDao.save(editTitle);
+            LogLevelSave(3,"Ünvan güncelleme işlemi başarılı");
+            return new SuccessDataResult("Ünvan güncelleme  işlemi başarılı",true,entityToDtoObject(editTitle));
+        }catch (Exception e){
+            LogLevelSave(1,"Bu id değerine ait bir ünvan bulunamadı");
+            return new ErrorResult("Bu id değerine ait bir ünvan bulunamadı",false);
+        }
     }
     @Override
-    public Title deleteTitle(Long id){
-        Title deleteTitle = titleDao.findById(id)  //girilen id değerine ait departman olup olmadığının kontrolü
-                .orElseThrow(()->{
-                    LogLevelSave(1,"Bu id değerine ait bir ünvan bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        List<Staff> staffList = staffDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
-        for (Staff staff : staffList) {
-            if (staff.getTitle().getId() == id) {
-                LogLevelSave(4, "Bu ünvan personel ile ilişkili, siliniemez.");
-                throw new RuntimeException("Bu ünvan personel ile ilişkili, silinemez.");
+    public Result deleteTitle(Long id){
+        Title deleteTitle;
+        try {
+            deleteTitle = titleDao.getById(id);
+            List<Staff> staffList = staffDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
+            for (Staff staff : staffList) {
+                if (staff.getManager().getId() == id) {
+                    LogLevelSave(4, "Bu ünvan, çalışan ile ilişkili, siliniemez.");
+                    return new ErrorResult("Bu ünvan, çalışan ile ilişkil, siliniemez.",false);
+                }
             }
+            LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
+            deleteTitle.setDeleted(true);
+            titleDao.save(deleteTitle);
+            return new SuccesEmptyResult("Yönetici silme işlemi başarılı",true);
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
+            return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
         }
-        LogLevelSave(3,"Departman silme İşlemi başarılı.");
-        deleteTitle.setDeleted(true);
-        return titleDao.save(deleteTitle);
-    }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
     }
 }
