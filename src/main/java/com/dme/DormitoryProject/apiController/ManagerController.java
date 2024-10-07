@@ -4,6 +4,7 @@ import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.Manager;
+import com.dme.DormitoryProject.response.MyResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,9 @@ public class ManagerController {
     }
 
     @GetMapping("getAll")
-    public ResponseEntity<Map<String,Object>> getAll() {
+    public MyResponseEntity<List<ManagerDTO>> getAll() {
         List<ManagerDTO> managers = this.managerService.getAll();
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Managers retrieved successfully");
-        response.put("data", managers);
-
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return new MyResponseEntity<>();
     }
 
     @GetMapping("managerId/{id}")
