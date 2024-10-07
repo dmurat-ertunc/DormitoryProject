@@ -39,7 +39,6 @@ public class LogLevelManager implements ILogLevelService {
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         lgoDao.save(log);
     }
@@ -74,10 +73,6 @@ public class LogLevelManager implements ILogLevelService {
 
     @Override
     public LogLevel saveLogLevel(LogLevelDTO logLevelDTO){
-        if(Objects.equals(logLevelDTO.getDescription(), "") || Objects.equals(logLevelDTO.getDescription(), null)){
-            LogLevelSave(3,"Log açıklaması tablosunda boşluk bırakılamaz");
-            throw new RuntimeException("hata");
-        }
         LogLevelSave(3,"Log açıklaması tablosuna ekleme işlemi başarılı");
         return logLevelDao.save(dtoToEntity(logLevelDTO));
     }
@@ -89,10 +84,6 @@ public class LogLevelManager implements ILogLevelService {
                    LogLevelSave(4,"Bu id değerine ait Log açıklaması bulunamadı.");
                    return new RuntimeException("hata");
                 });
-        if(Objects.equals(logLevelDTO.getDescription(), "") || Objects.equals(logLevelDTO.getDescription(), null)){
-            LogLevelSave(1,"Log açıklama tablosunda, güncelleme işlemi için boş alan bırakılamaz");
-            throw new RuntimeException("hata");
-        }
         updateLoglevel.setDescription(logLevelDTO.getDescription());
         LogLevelSave(3,"Log açıklaması tablosunda güncelleme başarılı");
         return logLevelDao.save(updateLoglevel);
@@ -117,7 +108,5 @@ public class LogLevelManager implements ILogLevelService {
         deleteLogLevel.setDeleted(true);
         return logLevelDao.save(deleteLogLevel);
     }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
-    }
+
 }

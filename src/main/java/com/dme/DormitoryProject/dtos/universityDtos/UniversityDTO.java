@@ -1,29 +1,54 @@
 package com.dme.DormitoryProject.dtos.universityDtos;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class UniversityDTO {
     private Long id;
+    @NotNull(message = "Üniversite isim alanı boş geçilemez")
+    @NotEmpty(message = "Üniversite isim alanı boş geçilemez")
     private String name;
+    @NotNull(message = "Üniversite mail alanı boş geçilemez")
+    @NotEmpty(message = "Üniversite mail alanı boş geçilemez")
+    @Column(unique = true)
     private String mail;
+    @NotNull(message = "Üniversite telefon numarası alanı boş geçilemez")
+    @NotEmpty(message = "Üniversite telefon numarası alanı boş geçilemez")
+    @Column(unique = true)
     private String phoneNumber;
+    @NotNull(message = "Üniversite şehir alanı boş geçilemez")
+    @NotEmpty(message = "Üniversite şehir alanı boş geçilemez")
     private String city;
-    private String studentName;
+    private Set<String> studentName;
     private Set<Long> studentIds = new HashSet<>(); // Öğrenci ID'leri
+    public UniversityDTO(){
+
+    }
+
+    public UniversityDTO(Long id, String name, String mail, String phoneNumber, String city, Set<String> studentName, Set<Long> studentIds) {
+        this.id = id;
+        this.name = name;
+        this.mail = mail;
+        this.phoneNumber = phoneNumber;
+        this.city = city;
+        this.studentName = studentName;
+        this.studentIds = studentIds;
+    }
 
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
-    public String getStudentName() {
+    public Set<String> getStudentName() {
         return studentName;
     }
-    public void setStudentName(String studentName) {
+    public void setStudentName(Set<String> studentName) {
         this.studentName = studentName;
     }
     public String getName() {

@@ -44,7 +44,6 @@ public class RentalManager implements IRentalService {
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         lgoDao.save(log);
     }
@@ -78,16 +77,11 @@ public class RentalManager implements IRentalService {
     }
     @Override
     public Rental saveRental(RentalDTO rentalDTO){
-        if(rentalDTO.getSportAreaId() == null || rentalDTO.getStudentId() == null || rentalDTO.getStartTime() == null || rentalDTO.getEndTime() == null || rentalDTO.getRentalDate() == null){
-            LogLevelSave(1,"Kiralama ekleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
         Rental rental = dtoToEntity(rentalDTO);
         if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
             LogLevelSave(1,"Kiralama ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
             throw new RuntimeException("Hata");
         }
-
         List<Rental> rentals = rentalDao.findAll();
         for(Rental rental1 : rentals){
             if (rentalDTO.getStartTime().isAfter(rental1.getStartTime())
@@ -97,8 +91,6 @@ public class RentalManager implements IRentalService {
                 throw new RuntimeException("Hata");
             }
         }
-
-
         LogLevelSave(3,"Kiralama işlemi başarılı.");
         return rentalDao.save(rental);
     }
@@ -110,10 +102,6 @@ public class RentalManager implements IRentalService {
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
 
-        if(rentalDTO.getSportAreaId() == null || rentalDTO.getStudentId() == null || rentalDTO.getStartTime() == null || rentalDTO.getEndTime() == null || rentalDTO.getRentalDate() == null){
-            LogLevelSave(1,"Kiralama güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
         Rental rental = dtoToEntity(rentalDTO);
         if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
             LogLevelSave(1,"Kiralama güncelleme işleminde, ilişki olacağı tablo kaldırılmış.");
@@ -137,9 +125,6 @@ public class RentalManager implements IRentalService {
         deleteRental.setDeleted(true);
         LogLevelSave(3,"Kiralama silme işlemi başarılı");
         return rentalDao.save(deleteRental);
-    }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
     }
 }
 //"startTime": "14:30:00",

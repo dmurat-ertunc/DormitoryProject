@@ -13,6 +13,7 @@ public class RentalMapper {
         rentalDTO.setEndTime(rental.getEndTime());
         rentalDTO.setRentalDate(rental.getRentalDate());
         rentalDTO.setStartTime(rental.getStartTime());
+        rentalDTO.setSporType(rental.getSportArea().getSporType());
         rentalDTO.setSportAreaId(rental.getSportArea().getId());
         rentalDTO.setStudentId(rental.getStudent().getId());
         rentalDTO.setStudentBirthDate(rental.getStudent().getBirthDate());

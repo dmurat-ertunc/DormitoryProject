@@ -51,7 +51,6 @@ public class StudentManager implements IStudentService{
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         lgoDao.save(log);
     }
@@ -84,17 +83,14 @@ public class StudentManager implements IStudentService{
         if (control(students,studentDTO,"getMail") || control(students,studentDTO,"getTcNo")){
             throw new RuntimeException("hata");
         }
-        if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
-            LogLevelSave(4,"Öğrenci ekleme işleminde boş alan bırakılamaz");
-            throw new RuntimeException("hata");
-        }
-        if(!(studentDTO.getTcNo().length() == 11)){
-            LogLevelSave(4,"Öğrenci ekleme işleminde TC kimlik numarısını uygun giriniz");
-            throw new RuntimeException("hata");
-        }
         studentDTO.setVerify(false);
         LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
         return studentDao.save(dtoToEntity(studentDTO));
+    }
+
+    @Override
+    public List<Student> saveStudentAll(List<Student> students){
+        return studentDao.saveAll(students);
     }
 
     @Override
@@ -109,44 +105,13 @@ public class StudentManager implements IStudentService{
         if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getMail")){
             throw  new RuntimeException("hata");
         }
-
-        if(studentDTO.getUniversityIds() == null || studentDTO.getMail() == "" || studentDTO.getName() == "" || studentDTO.getSurName() == "" || studentDTO.getTcNo() == "" || studentDTO.getBirthDate() == null){
-            LogLevelSave(4,"Öğrenci güncelleme işleminded boş alan bırakılamaz");
-            throw new RuntimeException("hata");
-        }
-        if(!(studentDTO.getTcNo().length() == 11)){
-            LogLevelSave(4,"Öğrenci güncelleme işleminde TC kimlik numarısını uygun giriniz");
-            throw new RuntimeException("hata");
-        }
         editStudent.setName(studentDTO.getName());
         editStudent.setTcNo(studentDTO.getTcNo());
         editStudent.setBirthDate(studentDTO.getBirthDate());
         editStudent.setSurName(studentDTO.getSurName());
         editStudent.setMail(studentDTO.getMail());
         LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
-            return studentDao.save(editStudent);
-    }
-
-
-    public boolean control(List<Student> students,StudentDTO studentDTO,String metot){
-        try {
-            // StudentDTO nesnesindeki ilgili metodu çağırarak değeri al
-            Method dtoMethod = studentDTO.getClass().getMethod(metot);
-            Object dtoValue = dtoMethod.invoke(studentDTO);
-            for (Student student : students) {
-                Method studentMethod = student.getClass().getMethod(metot);
-                Object studentValue = studentMethod.invoke(student);
-                if (studentValue.equals(dtoValue)) {
-                    LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
-                    return true;
-                }
-            }
-        } catch (NoSuchMethodException e) {
-            System.err.println("Belirtilen metot bulunamadı: " + e.getMessage());
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return studentDao.save(editStudent);
     }
 
     @Override
@@ -175,14 +140,27 @@ public class StudentManager implements IStudentService{
         return studentDao.save(deleteStudent);
     }
 
-    @Override
-    public List<Student> saveStudentAll(List<Student> students){
-        students.forEach(student -> student.setAddDate(getMomentDate()));
-        return studentDao.saveAll(students);
+    public boolean control(List<Student> students,StudentDTO studentDTO,String metot){
+        try {
+            // StudentDTO nesnesindeki ilgili metodu çağırarak değeri al
+            Method dtoMethod = studentDTO.getClass().getMethod(metot);
+            Object dtoValue = dtoMethod.invoke(studentDTO);
+            for (Student student : students) {
+                Method studentMethod = student.getClass().getMethod(metot);
+                Object studentValue = studentMethod.invoke(student);
+                if (studentValue.equals(dtoValue)) {
+                    LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
+                    return true;
+                }
+            }
+        } catch (NoSuchMethodException e) {
+            System.err.println("Belirtilen metot bulunamadı: " + e.getMessage());
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
-    }
+
 
 }
 

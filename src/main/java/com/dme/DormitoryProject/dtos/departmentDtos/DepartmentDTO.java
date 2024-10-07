@@ -1,11 +1,20 @@
 package com.dme.DormitoryProject.dtos.departmentDtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 public class DepartmentDTO {
+
+    private Long id;
+    @NotNull(message = "Departman ismi alanı boş geçilemez")
+    @NotEmpty(message = "Departman isi alanı boş geçilemez")
+    private String name;
 
     public DepartmentDTO(Long id, String name) {
         this.id = id;
         this.name = name;
     }
+
     public DepartmentDTO() {
 
     }
@@ -17,9 +26,6 @@ public class DepartmentDTO {
     public void setId(Long id) {
         this.id = id;
     }
-
-    private String name;
-    private Long id;
 
 
     public void setName(String name) {

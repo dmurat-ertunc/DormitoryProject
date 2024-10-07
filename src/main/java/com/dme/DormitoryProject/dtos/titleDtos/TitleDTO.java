@@ -1,6 +1,11 @@
 package com.dme.DormitoryProject.dtos.titleDtos;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 public class TitleDTO {
+    @NotNull(message = "Ünvan ismi alanı boş bırakılamaz")
+    @NotEmpty(message = "Ünvan ismi alanı boş bırakılamaz")
     private String name;
     private Long id;
 

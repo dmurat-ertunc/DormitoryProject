@@ -71,10 +71,6 @@ public class DepartmentManager implements IDepartmentService{
     }
     @Override
     public Department saveDepartment(DepartmentDTO departmentDTO){
-        if (Objects.equals(departmentDTO.getName(), "")){
-            logLevelSave(4,"Departman ekleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Departman ekleme işleminde boş alan bırakılamaz. " + 4);
-        }
         logLevelSave(3,"Departman ekleme işlemi başarılı.");
         return departmentDao.save(dtoToEntity(departmentDTO));
     }
@@ -85,16 +81,11 @@ public class DepartmentManager implements IDepartmentService{
                     logLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
-
-        if (Objects.equals(departmentDTO.getName(), "")){
-            logLevelSave(4,"Departman güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Departman güncelleme işleminde boş alan bırakılamaz. " + id);
-        }
         editDepartment.setName(departmentDTO.getName());
         logLevelSave(3,"Departman güncelleme işlemi başarılı.");
         return departmentDao.save(editDepartment);
     }
-
+    @Override
     public Department deleteDepartment(Long id)
     {
         Department deleteDepartment = departmentDao.findById(id)  //girilen id değerine ait departman olup olmadığının kontrolü

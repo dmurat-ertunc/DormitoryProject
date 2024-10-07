@@ -75,28 +75,6 @@ public class StaffManager implements IStaffService {
     }
     @Override
     public Staff saveStaff(StaffDTO staffDTO){
-        if (staffDTO.getName()=="" || staffDTO.getMail()=="" || staffDTO.getPhoneNumber()=="" || staffDTO.getSalary() == 0
-                || staffDTO.getSurName() == "" || staffDTO.getDepartmentId() == null || staffDTO.getTitleId() == null || staffDTO.getManagerId() == null){
-            LogLevelSave(1,"Personel ekleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
-        List<Staff> staffs = staffDao.findAll();
-        for (Staff staff: staffs){
-            if(Objects.equals(staff.getMail(), staff.getMail())){
-                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        for (Staff staff: staffs){
-            if(Objects.equals(staff.getPhoneNumber(), staff.getPhoneNumber())){
-                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        if (!(staffDTO.getPhoneNumber().length() == 11 && staffDTO.getPhoneNumber().startsWith("0"))) {
-            LogLevelSave(1,"Personel ekleme işleminde telefon numarası alanına uygun girin.");
-            throw new RuntimeException("Hata");
-        }
         Staff staff = dtoToEntity(staffDTO);
         // staffların bağlanacığı tablolar var mı yok mu kontrolü için dto entitiye çevrildi
         if (staff.getDepartment().getIsDeleted() || staff.getTitle().getIsDeleted() || staff.getManager().getIsDeleted()){
@@ -114,29 +92,6 @@ public class StaffManager implements IStaffService {
                     LogLevelSave(1,"Bu id değerine ait bir personel bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
-
-        if (Objects.equals(staffDTO.getName(), "") || Objects.equals(staffDTO.getMail(), "") || Objects.equals(staffDTO.getPhoneNumber(), "") || staffDTO.getSalary() == 0
-                || Objects.equals(staffDTO.getSurName(), "")){
-            LogLevelSave(1,"Personel güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
-        List<Staff> staffs = staffDao.findAll();
-        for (Staff staff: staffs){
-            if(Objects.equals(staff.getMail(), staff.getMail()) && !Objects.equals(staffDTO.getId(),id)){
-                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        for (Staff staff: staffs){
-            if(Objects.equals(staff.getPhoneNumber(), staff.getPhoneNumber()) && !Objects.equals(staffDTO.getId(),id)){
-                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        if (!(staffDTO.getPhoneNumber().length() == 11 && staffDTO.getPhoneNumber().startsWith("0"))) {
-            LogLevelSave(1,"Personel güncelleme işleminde telefon numarası alanına uygun girin.");
-            throw new RuntimeException("Hata");
-        }
 
         Staff staff = dtoToEntity(staffDTO);
         if (staff.getDepartment().getIsDeleted() || staff.getTitle().getIsDeleted() || staff.getManager().getIsDeleted()){

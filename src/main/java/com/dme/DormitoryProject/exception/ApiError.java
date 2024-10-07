@@ -28,8 +28,6 @@ public class ApiError<T> {
         this.errors = errors;
     }
 
-
-
     public String getId() {
         return id;
     }

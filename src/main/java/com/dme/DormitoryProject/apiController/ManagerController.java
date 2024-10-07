@@ -10,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,8 +28,14 @@ public class ManagerController {
     }
 
     @GetMapping("getAll")
-    public List<ManagerDTO> getAll(){
-        return this.managerService.getAll();
+    public ResponseEntity<Map<String,Object>> getAll() {
+        List<ManagerDTO> managers = this.managerService.getAll();
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("message", "Managers retrieved successfully");
+        response.put("data", managers);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("managerId/{id}")

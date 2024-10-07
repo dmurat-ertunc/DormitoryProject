@@ -22,6 +22,11 @@ public class UniversityMapper {
                 .collect(Collectors.toSet());
         dto.setStudentIds(studentIds);
 
+        Set<String> studentName = university.getStudents().stream()
+                .map(Student::getName)
+                .collect(Collectors.toSet());
+        dto.setStudentName(studentName);
+
         return dto;
     }
 

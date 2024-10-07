@@ -78,10 +78,6 @@ public class SportAreaManager implements ISporAreaService {
     }
     @Override
     public SportArea saveSportArea(SportAreaDTO sportAreaDTO){
-        if(sportAreaDTO.getSportType() == null || Objects.equals(sportAreaDTO.getSportType(), "")){
-            LogLevelSave(4,"Spor alanı eklerken boş alan bırakılamaz");
-            throw new RuntimeException("hata");
-        }
         LogLevelSave(2,"Spor alanı eklendi.");
         return sportAreaDao.save(dtoToEntity(sportAreaDTO));
     }
@@ -92,11 +88,6 @@ public class SportAreaManager implements ISporAreaService {
                     LogLevelSave(1,"Bu id değerine ait bir spor alanı bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
-
-        if(Objects.equals(sportAreaDTO.getSportType(),null) || Objects.equals(sportAreaDTO.getSportType(),"")){
-            LogLevelSave(4,"Spor alanı güncellerken boş alan bırakılamaz");
-            throw new RuntimeException("hata");
-        }
         editSportArea.setSporType(sportAreaDTO.getSportType());
         LogLevelSave(3,"Spor alanı güncelleme işlemi başarılı");
         return sportAreaDao.save(editSportArea);

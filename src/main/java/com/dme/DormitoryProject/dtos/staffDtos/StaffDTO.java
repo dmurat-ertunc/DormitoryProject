@@ -1,14 +1,45 @@
 package com.dme.DormitoryProject.dtos.staffDtos;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 public class StaffDTO {
 
     private Long id;
+    @NotNull(message = "Çalışan isim alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan isim alanı boş bırakılamaz")
     private String name;
+    @NotNull(message = "Çalışan soyisim alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan soyisim alanı boş bırakılamaz")
     private String surName;
+    @NotNull(message = "Çalışan mail alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan mail alanı boş bırakılamaz")
+    @Column(unique = true)
     private String mail;
+    @NotNull(message = "Çalışan maaş alanı boş bırakılamaz")
     private int salary;
+    @NotNull(message = "Çalışan telefon numarası alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan telefon numarası alanı boş bırakılamaz")
+    @Column(unique = true)
     private String phoneNumber;
+    @NotNull(message = "Çalışanın bağlı olduğu departman Id alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışanın bağlı olduğu departman Id alanı boş bırakılamaz")
     private Long departmentId; // Department'ın ID'si
+    private String departmentName;
+    @NotNull(message = "Çalışan bağlı olduğu ünvan Id alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan bağlı olduğu ünvan Id alanı boş bırakılamaz")
+    private Long titleId; // Title'ın ID'si
+    private String titleName;
+    @NotNull(message = "Çalışan bağlı olduğu yönetici Id alanı boş bırakılamaz")
+    @NotEmpty(message = "Çalışan bağlı olduğu yönetici Id alanı boş bırakılamaz")
+    private Long managerId; // Manager'ın ID'si
+    private String managerMail;
+    private String managerName;
+    private String managerPhoneNumber;
+    private int managerSalary;
+    private String managerSurName;
+    private String managerTitle;
 
     public StaffDTO(Long id, String name, String surName, String mail, int salary, String phoneNumber, Long departmentId, String departmentName, Long titleId, String titleName, Long managerId, String managerMail, String managerName, String managerPhoneNumber, int managerSalary, String managerSurName, String managerTitle) {
         this.id = id;
@@ -29,41 +60,26 @@ public class StaffDTO {
         this.managerSurName = managerSurName;
         this.managerTitle = managerTitle;
     }
+
     public StaffDTO(){
 
     }
 
-    private String departmentName;
-    private Long titleId; // Title'ın ID'si
-    private String titleName;
-    private Long managerId; // Manager'ın ID'si
-    private String managerMail;
-    private String managerName;
-    private String managerPhoneNumber;
-    private int managerSalary;
-    private String managerSurName;
-    private String managerTitle;
-
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
-
     public String getManagerTitle() {
         return managerTitle;
     }
-
     public void setManagerTitle(String managerTitle) {
         this.managerTitle = managerTitle;
     }
-
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -124,39 +140,30 @@ public class StaffDTO {
     public String getManagerMail() {
         return managerMail;
     }
-
     public void setManagerMail(String managerMail) {
         this.managerMail = managerMail;
     }
-
     public String getManagerName() {
         return managerName;
     }
-
     public void setManagerName(String managerName) {
         this.managerName = managerName;
     }
-
     public String getManagerPhoneNumber() {
         return managerPhoneNumber;
     }
-
     public void setManagerPhoneNumber(String managerPhoneNumber) {
         this.managerPhoneNumber = managerPhoneNumber;
     }
-
     public int getManagerSalary() {
         return managerSalary;
     }
-
     public void setManagerSalary(int managerSalary) {
         this.managerSalary = managerSalary;
     }
-
     public String getManagerSurName() {
         return managerSurName;
     }
-
     public void setManagerSurName(String managerSurName) {
         this.managerSurName = managerSurName;
     }

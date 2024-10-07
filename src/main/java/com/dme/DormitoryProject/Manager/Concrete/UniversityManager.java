@@ -73,21 +73,6 @@ public class UniversityManager implements IUniversityService {
     }
     @Override
     public University saveUniversity(UniversityDTO universityDTO){
-        if(universityDTO.getCity() == "" || universityDTO.getMail() == "" || universityDTO.getName() == "" || universityDTO.getPhoneNumber() == ""){
-            LogLevelSave(4,"Üniversite ekleme işleminde boş alan bırakılamaz");
-            throw  new RuntimeException("hata");
-        }
-        if(!(universityDTO.getPhoneNumber().length() == 11 && universityDTO.getPhoneNumber().startsWith("0"))){
-            LogLevelSave(4,"Üniversite ekleme işleminde telefon numarasını alanını uıygun girin");
-            throw  new RuntimeException("hata");
-        }
-        List<University> universities = universityDao.findAll();
-        for (University university: universities){
-            if(Objects.equals(university.getmail(), universityDTO.getMail())){
-                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
 
         LogLevelSave(3,"Üniversite ekleme işlemi başarılı");
         return universityDao.save(dtoToEntity(universityDTO));
@@ -99,18 +84,6 @@ public class UniversityManager implements IUniversityService {
                     LogLevelSave(1,"Bu id değerine ait bir üniversite bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
-
-        if (universityDTO.getName() == "" || universityDTO.getPhoneNumber() == "" || universityDTO.getCity() == "" || universityDTO.getMail() == ""){
-            LogLevelSave(4,"Üniversite güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Üniversite güncelleme işleminde boş alan bırakılamaz. " + id);
-        }
-        List<University> universities = universityDao.findAll();
-        for (University university: universities){
-            if(Objects.equals(university.getmail(), universityDTO.getMail()) && Objects.equals(university.getId(),id)){
-                LogLevelSave(4,"Bu mail adresine ait öğrenci zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
         editUniversity.setName(universityDTO.getName());
         editUniversity.setcity(universityDTO.getCity());
         editUniversity.setmail(universityDTO.getMail());

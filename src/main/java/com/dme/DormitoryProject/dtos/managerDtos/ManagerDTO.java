@@ -2,21 +2,32 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 
 
 import com.dme.DormitoryProject.annotations.MailUniqueCheck;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class ManagerDTO {
-    @NotEmpty(message = "mail boş kalamaz mla")
-    @NotNull(message = "mail boş kalamaz")
+    @NotEmpty(message = "Mail alanı boş bırakılamaz")
+    @NotNull(message = "Mail alanı boş bırakılmaz")
     @MailUniqueCheck
     private String mail;
+    @NotEmpty(message = "İsim alanı boş bırakılamaz")
+    @NotNull(message = "İsim alanı boş bırakılmaz")
     private String name;
+    @NotEmpty(message = "Soyisim alanı boş bırakılamaz")
+    @NotNull(message = "Soyisim alanı boş bırakılmaz")
     private String surName;
     @Pattern(regexp = "^[0-9]+$", message = "Sadece rakam içermelidir.")
     @Pattern(regexp = "^0\\d{10}$", message = "Telefon numarası 0 ile başlamalı ve 11 karakter olmalıdır.")
+    @NotEmpty(message = "Telefon numarası alanı boş bırakılamaz")
+    @NotNull(message = "Telefon numarası alanı boş bırakılmaz")
+    @Column(unique = true)
     private String phoneNumber;
+    @NotNull(message = "Maaş alanı boş bırakılmaz")
     private int salary;
+    @NotEmpty(message = "Ünvan alanı boş bırakılamaz")
+    @NotNull(message = "Ünvan alanı boş bırakılmaz")
     private String title;
     private Long id;
 

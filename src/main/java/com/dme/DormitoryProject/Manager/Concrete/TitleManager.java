@@ -74,10 +74,6 @@ public class TitleManager implements ITitleService {
     }
     @Override
     public Title saveTitle(TitleDTO titleDTO){
-        if (titleDTO.getName() == ""){
-            LogLevelSave(4,"Ünvan ekleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Ünvan ekleme işleminde boş alan bırakılamaz. " + 4);
-        }
         LogLevelSave(3,"Ünvan ekleme işlemi başarılı.");
         return titleDao.save(dtoToEntity(titleDTO));
 
@@ -89,11 +85,6 @@ public class TitleManager implements ITitleService {
                     LogLevelSave(1,"Bu id değerine ait bir ünvan bulunamadı.");
                     return new RuntimeException("Bu id'ye sahip veri yok: " + id);
                 });
-
-        if (titleDTO.getName() == ""){
-            LogLevelSave(4,"ünvan güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("ünvan güncelleme işleminde boş alan bırakılamaz. " + id);
-        }
         editTitle.setName(titleDTO.getName());
         LogLevelSave(3,"ünvan güncelleme işlemi başarılı.");
         return titleDao.save(editTitle);

@@ -5,6 +5,7 @@ import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.*;
+import com.dme.DormitoryProject.exception.GlobalExceptionHandler;
 import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IManagerDao;
@@ -24,13 +25,15 @@ public class ManagerManager implements IManagerService {
     private ILgoDao logDao;
     private ILogLevelDao logLevelDao;
     private IStaffDao staffDao;
+    private GlobalExceptionHandler globalExceptionHandler;
 
     @Autowired
-    public ManagerManager(IManagerDao managerDao, ILgoDao logDao,ILogLevelDao logLevelDao,IStaffDao staffDao){
+    public ManagerManager(IManagerDao managerDao, ILgoDao logDao,ILogLevelDao logLevelDao,IStaffDao staffDao,GlobalExceptionHandler globalExceptionHandler){
         this.managerDao=managerDao;
         this.logDao=logDao;
         this.logLevelDao=logLevelDao;
         this.staffDao=staffDao;
+        this.globalExceptionHandler=globalExceptionHandler;
     }
 
 
@@ -41,7 +44,6 @@ public class ManagerManager implements IManagerService {
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         logDao.save(log);
     }
@@ -50,8 +52,8 @@ public class ManagerManager implements IManagerService {
         List<ManagerDTO> managerDTOS = new ArrayList<>();
 
         for (Manager manager : managers) {
-            //ManagerDTO dto = ManagerMapper.toDTO(manager);
-            //managerDTOS.add(dto);
+            ManagerDTO dto = ManagerMapper.toDTO(manager);
+            managerDTOS.add(dto);
         }
         return managerDTOS;
     }
@@ -77,58 +79,16 @@ public class ManagerManager implements IManagerService {
 
     @Override
     public Manager saveManager(ManagerDTO managerDTO){
-        if (managerDTO.getName()==null || managerDTO.getPhoneNumber()==null || managerDTO.getSalary() == 0 || managerDTO.getSurName() == null || managerDTO.getTitle()==null){
-            LogLevelSave(1,"Yönetici ekleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
-        if(!(managerDTO.getPhoneNumber().length() == 11 && managerDTO.getPhoneNumber().startsWith("0"))){
-            LogLevelSave(4,"Telefon numarası alanını uygun girin");
-            throw new RuntimeException("hata");
-        }
-        //List<Manager> managers = managerDao.findAll();
-        //for (Manager manager: managers){
-        //    if(Objects.equals(manager.getMail(), managerDTO.getMail())){
-        //        LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
-        //        throw new RuntimeException("hata");
-        //    }
-        //}
-        //for (Manager manager: managers){
-        //    if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber())){
-        //        LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
-        //        throw new RuntimeException("hata");
-        //   }
-        //}
-
-            LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
+        LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
         return managerDao.save(dtoToEntity(managerDTO));
     }
     public Manager updateManager(Long id, ManagerDTO managerDTO){
         Manager editManager = managerDao.findById(id)
                         .orElseThrow(()-> {
                             LogLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
-                            return new RuntimeException("Bu id'ye sahip veri yok: " + id);
+                            //globalExceptionHandler.catchError("id","Bu id değerine ait yönetici bulunamadı");
+                            throw new RuntimeException("hata");
                         });
-        List<Manager> managers = managerDao.findAll();
-        for (Manager manager: managers){
-            if(Objects.equals(manager.getMail(), managerDTO.getMail()) && !Objects.equals(manager.getId(),id)){
-                LogLevelSave(4,"Bu mail hesabına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        for (Manager manager: managers){
-            if(Objects.equals(manager.getPhoneNumber(), managerDTO.getPhoneNumber()) && !Objects.equals(manager.getId(),id)){
-                LogLevelSave(4,"Bu telefon numarasına ait yönetici zaten mevcuttur");
-                throw new RuntimeException("hata");
-            }
-        }
-        if (managerDTO.getName()=="" || managerDTO.getMail()=="" || managerDTO.getPhoneNumber()=="" || managerDTO.getSalary() == 0 || managerDTO.getSurName() == "" || managerDTO.getTitle()==""){
-            LogLevelSave(1,"Yönetici güncelleme işleminde boş alan bırakılamaz.");
-            throw new RuntimeException("Hata");
-        }
-        if (!(managerDTO.getPhoneNumber().length() == 11 || managerDTO.getPhoneNumber().startsWith("0"))) {
-            LogLevelSave(1,"Yönetici güncelleme işleminde telefon numarası alanına uygun girin.");
-            throw new RuntimeException("Hata");
-        }
         editManager.setName(managerDTO.getName());
         editManager.setMail(managerDTO.getMail());
         editManager.setPhoneNumber(managerDTO.getPhoneNumber());
@@ -154,8 +114,5 @@ public class ManagerManager implements IManagerService {
         LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
         deleteManager.setDeleted(true);
         return managerDao.save(deleteManager);
-    }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
     }
 }

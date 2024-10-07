@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.lang.reflect.Method;
 import java.util.*;
 
 @ControllerAdvice
@@ -31,9 +32,14 @@ public class GlobalExceptionHandler {
             }
         }
         return ResponseEntity.badRequest().body(createApiError(errorsMap));
-
-
     }
+
+    //public ResponseEntity<ApiError> catchError(String metotName, String message) {
+    //    Map<String, List<String>> error = new HashMap<>();
+    //    error.put(metotName, addMapValue(new ArrayList<>(), message));
+    //    return ResponseEntity.badRequest().body(createApiError(error));
+    //}
+
 
     private <T> ApiError<T> createApiError(T errors) {
         ApiError<T> apiError = new ApiError<T>();
