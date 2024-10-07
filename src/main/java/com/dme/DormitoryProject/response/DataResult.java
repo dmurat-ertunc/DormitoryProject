@@ -8,6 +8,9 @@ public class DataResult<T> extends Result{
         super(message, status);
         this.data = data;
     }
+    public DataResult(String message, Boolean status) {
+        super(message, status);
+    }
 
     public T getData() {
         return data;

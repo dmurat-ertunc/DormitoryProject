@@ -12,7 +12,6 @@ public class ManagerMapper {
         managerDTO.setPhoneNumber(manager.getPhoneNumber());
         managerDTO.setSalary(manager.getSalary());
         managerDTO.setSurName(manager.getSurName());
-        managerDTO.setTitle(manager.getTitle());
 
         return managerDTO;
     }

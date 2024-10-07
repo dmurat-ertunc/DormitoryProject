@@ -2,10 +2,8 @@ package com.dme.DormitoryProject.Manager.Abstract;
 
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.entity.Manager;
-import com.dme.DormitoryProject.response.MyResponseEntity;
 import com.dme.DormitoryProject.response.Result;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface IManagerService {

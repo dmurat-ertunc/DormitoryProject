@@ -2,20 +2,13 @@ package com.dme.DormitoryProject.apiController;
 
 import com.dme.DormitoryProject.Manager.Abstract.IManagerService;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
-import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.Manager;
-import com.dme.DormitoryProject.response.MyResponseEntity;
 import com.dme.DormitoryProject.response.Result;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,7 +24,7 @@ public class ManagerController {
 
     @GetMapping("getAll")
     public Result getAll() {
-        MyResponseEntity managers = this.managerService.getAll();
+        Result managers = this.managerService.getAll();
         return managers;
     }
 

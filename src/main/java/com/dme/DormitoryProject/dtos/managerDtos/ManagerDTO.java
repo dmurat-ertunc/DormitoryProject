@@ -2,6 +2,7 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 
 
 import com.dme.DormitoryProject.annotations.MailUniqueCheck;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class ManagerDTO {
     @NotEmpty(message = "Ünvan alanı boş bırakılamaz")
     @NotNull(message = "Ünvan alanı boş bırakılmaz")
     private String title;
+
     private Long id;
 
     public ManagerDTO(){
