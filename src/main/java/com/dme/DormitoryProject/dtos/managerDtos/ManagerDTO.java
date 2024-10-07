@@ -9,9 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class ManagerDTO {
+    //@MailUniqueCheck
     @NotEmpty(message = "Mail alanı boş bırakılamaz")
     @NotNull(message = "Mail alanı boş bırakılmaz")
-    @MailUniqueCheck
+    @Column(unique = true)
     private String mail;
     @NotEmpty(message = "İsim alanı boş bırakılamaz")
     @NotNull(message = "İsim alanı boş bırakılmaz")

@@ -12,7 +12,9 @@ import com.dme.DormitoryProject.repository.IManagerDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
 import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesEmptyResult;
 import com.dme.DormitoryProject.response.SuccessDataResult;
+import org.hibernate.action.internal.EntityActionVetoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +51,7 @@ public class ManagerManager implements IManagerService {
         logDao.save(log);
     }
 
-    public List<ManagerDTO> entityToDto(List<Manager> managers){
+    public List<ManagerDTO> entityToDtoList(List<Manager> managers){
         List<ManagerDTO> managerDTOS = new ArrayList<>();
 
         for (Manager manager : managers) {
@@ -57,6 +59,10 @@ public class ManagerManager implements IManagerService {
             managerDTOS.add(dto);
         }
         return managerDTOS;
+    }
+
+    public ManagerDTO entityToDtoObject(Manager manager){
+        return ManagerMapper.toDTO(manager);
     }
 
     public Manager dtoToEntity(ManagerDTO managerDTO){
@@ -67,58 +73,72 @@ public class ManagerManager implements IManagerService {
     public Result getAll(){
         try {
             List<Manager> managerList = managerDao.findAll();
-            List<ManagerDTO> managerDTOList = entityToDto(managerList);
+            List<ManagerDTO> managerDTOList = entityToDtoList(managerList);
             //return new MyResponseEntity<>(true,"başarılı",managerList);
-            return new SuccessDataResult("başarılı",true,managerDTOList);
+            return new SuccessDataResult("Tüm yöneticileri listeleme işlemi başarılı",true,managerDTOList);
         } catch (Exception e) {
-            return new ErrorResult("başarısız",false);
+            return new ErrorResult("Tüm yöneticileri listeleme işlemi başarısız",false);
         }
     }
     @Override
-    public Optional<ManagerDTO> getById(Long id){
-        List<ManagerDTO> managerDTOS = entityToDto(managerDao.findAll());
-        LogLevelSave(2, "Id değerine göre yönetici listelendi");
-        return managerDTOS.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
+    public Result getById(Long id){
+        try {
+            Manager findManager = managerDao.getById(id);
+            LogLevelSave(3,"İd değerine göre yönetici işlemi başarılı");
+            return new SuccessDataResult("İd değerine göre yönetici verisi, başarılı bir şekilde döndürüldü",true, entityToDtoObject(findManager));
+
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
+            return new ErrorResult("Bu id değerine ait yönetici bulunamadı",false);
+
+        }
     }
 
     @Override
-    public Manager saveManager(ManagerDTO managerDTO){
+    public Result saveManager(ManagerDTO managerDTO){
         LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
-        return managerDao.save(dtoToEntity(managerDTO));
+        managerDao.save(dtoToEntity(managerDTO));
+        return new SuccessDataResult("Yönetici ekleme işlemi başarılı",true,managerDTO);
     }
-    public Manager updateManager(Long id, ManagerDTO managerDTO){
-        Manager editManager = managerDao.findById(id)
-                        .orElseThrow(()-> {
-                            LogLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
-                            //globalExceptionHandler.catchError("id","Bu id değerine ait yönetici bulunamadı");
-                            throw new RuntimeException("hata");
-                        });
-        editManager.setName(managerDTO.getName());
-        editManager.setMail(managerDTO.getMail());
-        editManager.setPhoneNumber(managerDTO.getPhoneNumber());
-        editManager.setSalary(managerDTO.getSalary());
-        editManager.setSurName(managerDTO.getSurName());
-        editManager.setTitle(managerDTO.getTitle());
-        LogLevelSave(3,"Yöentici güncelleme işlemi başarılı");
-        return managerDao.save(editManager);
-    }
-    public Manager deleteManager(Long id){
-        Manager deleteManager = managerDao.findById(id)
-                .orElseThrow(()->{
-                   LogLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
-                   return new RuntimeException("hata");
-                });
-        List<Staff> staffList = staffDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
-        for (Staff staff : staffList) {
-            if (staff.getManager().getId() == id) {
-                LogLevelSave(4, "Bu manager yönetici ile ilişkili, siliniemez.");
-                throw new RuntimeException("Bu manager yönetici ile ilişkili, silinemez.");
-            }
+    public Result updateManager(Long id, ManagerDTO managerDTO){
+        Manager editManager;
+        try {
+            editManager = managerDao.getById(id);
+            editManager.setName(managerDTO.getName());
+            editManager.setMail(managerDTO.getMail());
+            editManager.setPhoneNumber(managerDTO.getPhoneNumber());
+            editManager.setSalary(managerDTO.getSalary());
+            editManager.setSurName(managerDTO.getSurName());
+            editManager.setTitle(managerDTO.getTitle());
+            LogLevelSave(3,"Yöentici güncelleme işlemi başarılı");
+            managerDao.save(editManager);
+            return new SuccessDataResult("Yönetici güncelleme  işlemi başarılı",true,editManager);
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
+            return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
         }
-        LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
-        deleteManager.setDeleted(true);
-        return managerDao.save(deleteManager);
+    }
+    public Result deleteManager(Long id){
+        Manager deleteManager;
+        try {
+            deleteManager = managerDao.getById(id);
+            List<Staff> staffList = staffDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
+            for (Staff staff : staffList) {
+                if (staff.getManager().getId() == id) {
+                    LogLevelSave(4, "Bu manager yönetici ile ilişkili, siliniemez.");
+                    return new ErrorResult("Bu yönetici, çalışan ile ilişkil, siliniemez.",false);
+                }
+            }
+            LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
+            deleteManager.setDeleted(true);
+            managerDao.save(deleteManager);
+            return new SuccesEmptyResult("Yönetici silme işlemi başarılı",true);
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
+            return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
+        }
     }
 }

@@ -24,24 +24,22 @@ public class ManagerController {
 
     @GetMapping("getAll")
     public Result getAll() {
-        Result managers = this.managerService.getAll();
-        return managers;
+        return this.managerService.getAll();
     }
-
     @GetMapping("managerId/{id}")
-    public Optional<ManagerDTO> getById(@PathVariable Long id){
+    public Result getById(@PathVariable Long id){
         return this.managerService.getById(id);
     }
     @PostMapping("saveManager")
-    public Manager saveManager(@RequestBody @Valid ManagerDTO managerDTO){
+    public Result saveManager(@RequestBody @Valid ManagerDTO managerDTO){
         return this.managerService.saveManager(managerDTO);
     }
     @PutMapping("update/{id}")
-    public Manager updateManager(@PathVariable Long id,@RequestBody ManagerDTO managerDTO){
-        return this.managerService.updateManager(id,managerDTO);
+    public Result updateManager(@PathVariable Long id,@RequestBody @Valid ManagerDTO managerDTO){
+        return managerService.updateManager(id,managerDTO);
     }
     @PutMapping("delete/{id}")
-    public Manager deleteManager(@PathVariable Long id){
+    public Result deleteManager(@PathVariable Long id){
         return this.managerService.deleteManager(id);
     }
 }

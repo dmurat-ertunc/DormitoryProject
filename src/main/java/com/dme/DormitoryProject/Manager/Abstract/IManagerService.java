@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface IManagerService {
     Result getAll();
-    Optional<ManagerDTO> getById(Long id);
-    Manager saveManager(ManagerDTO managerDTO);
-    Manager updateManager(Long id,ManagerDTO managerDTO);
-    Manager deleteManager(Long id);
+    Result getById(Long id);
+    Result saveManager(ManagerDTO managerDTO);
+    Result updateManager(Long id,ManagerDTO managerDTO);
+    Result deleteManager(Long id);
 }
