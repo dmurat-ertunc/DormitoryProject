@@ -5,6 +5,7 @@ import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
 import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.entity.Manager;
 import com.dme.DormitoryProject.response.MyResponseEntity;
+import com.dme.DormitoryProject.response.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +30,9 @@ public class ManagerController {
     }
 
     @GetMapping("getAll")
-    public MyResponseEntity<List<ManagerDTO>> getAll() {
-        List<ManagerDTO> managers = this.managerService.getAll();
-        return new MyResponseEntity<>();
+    public Result getAll() {
+        MyResponseEntity managers = this.managerService.getAll();
+        return managers;
     }
 
     @GetMapping("managerId/{id}")

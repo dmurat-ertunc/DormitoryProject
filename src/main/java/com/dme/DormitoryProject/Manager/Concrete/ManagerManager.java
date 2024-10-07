@@ -10,7 +10,10 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IManagerDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
+import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.MyResponseEntity;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,12 +67,13 @@ public class ManagerManager implements IManagerService {
     }
 
     @Override
-    public List<ManagerDTO> getAll(){
+    public Result getAll(){
         try {
             List<Manager> managerList = managerDao.findAll();
-
+            //return new MyResponseEntity<>(true,"başarılı",managerList);
+            return new  SuccessDataResult("başarılı",true,managerList);
         } catch (Exception e) {
-
+            return new ErrorResult("başarısız",false);
         }
     }
     @Override

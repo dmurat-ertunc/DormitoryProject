@@ -1,19 +1,21 @@
 package com.dme.DormitoryProject.response;
 
+
 public class MyResponseEntity<T> {
     private boolean status;
     private String message;
     private T data;
-    // Constructor
+
     public MyResponseEntity(boolean status, String message, T data) {
         this.status = status;
         this.message = message;
         this.data = data;
     }
-    public MyResponseEntity(){
-
+    public MyResponseEntity(boolean status,String message){
+        this.status=status;
+        this.message=message;
     }
-    // Getter ve Setter metodları
+
     public boolean getStatus() {
         return status;
     }
@@ -31,5 +33,9 @@ public class MyResponseEntity<T> {
     }
     public void setData(T data) {
         this.data = data;
+    }
+
+    public static <T> MyResponseEntity<T> success(T data) {
+        return new MyResponseEntity<>(true, "başarılı", data);
     }
 }
