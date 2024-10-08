@@ -4,6 +4,7 @@ package com.dme.DormitoryProject.dtos.managerDtos;
 import com.dme.DormitoryProject.annotations.MailUniqueCheck;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -12,6 +13,7 @@ public class ManagerDTO {
     //@MailUniqueCheck
     @NotEmpty(message = "Mail alanı boş bırakılamaz")
     @NotNull(message = "Mail alanı boş bırakılmaz")
+    @Email(message = "Mail alanını uygun formatta giriniz")
     @Column(unique = true)
     private String mail;
     @NotEmpty(message = "İsim alanı boş bırakılamaz")

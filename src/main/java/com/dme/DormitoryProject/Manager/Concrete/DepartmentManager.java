@@ -8,7 +8,14 @@ import com.dme.DormitoryProject.repository.IDepartmentDao;
 import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesResult;
+import com.dme.DormitoryProject.response.SuccessDataResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.text.Collator;
@@ -19,6 +26,7 @@ import java.util.stream.Collectors;
 @Service
 public class DepartmentManager implements IDepartmentService{
 
+    private static final Logger log = LoggerFactory.getLogger(DepartmentManager.class);
     private IDepartmentDao departmentDao;
     private IStaffDao staffDao;
     private ILgoDao lgoDao;
@@ -41,7 +49,7 @@ public class DepartmentManager implements IDepartmentService{
         lgoDao.save(log);
     }
 
-    public List<DepartmentDTO> entityToDto(List<Department> departments){
+    public List<DepartmentDTO> entityToDtoList(List<Department> departments){
         List<DepartmentDTO> departmentDTOS = new ArrayList<>();
 
         for (Department department : departments) {
@@ -51,58 +59,83 @@ public class DepartmentManager implements IDepartmentService{
         return departmentDTOS;
     }
 
+    public DepartmentDTO entityToDtoObject(Department department){
+        return DepartmentMapper.toDTO(department);
+    }
+
     public Department dtoToEntity(DepartmentDTO departmentDTO){
         return DepartmentMapper.toEntity(departmentDTO);
     }
 
     @Override
-    public List<DepartmentDTO> getAll(){
-        List<Department> departmentList = departmentDao.findAll();
-        logLevelSave(2, "Tüm departmanlar listelendi");
-        return entityToDto(departmentList);
-    }
-    @Override
-    public Optional<DepartmentDTO> getById(Long id){
-        List<DepartmentDTO> departmentDTOS = entityToDto(departmentDao.findAll());
-        logLevelSave(2, "Id değerine göre departman listelendi");
-        return departmentDTOS.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
-    }
-    @Override
-    public Department saveDepartment(DepartmentDTO departmentDTO){
-        logLevelSave(3,"Departman ekleme işlemi başarılı.");
-        return departmentDao.save(dtoToEntity(departmentDTO));
-    }
-    @Override
-    public Department updateDepartment(Long id,DepartmentDTO departmentDTO){
-        Department editDepartment = departmentDao.findById(id)
-                .orElseThrow(()-> {
-                    logLevelSave(1,"Bu id değerine ait bir yönetici bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        editDepartment.setName(departmentDTO.getName());
-        logLevelSave(3,"Departman güncelleme işlemi başarılı.");
-        return departmentDao.save(editDepartment);
-    }
-    @Override
-    public Department deleteDepartment(Long id)
-    {
-        Department deleteDepartment = departmentDao.findById(id)  //girilen id değerine ait departman olup olmadığının kontrolü
-                .orElseThrow(()->{
-                    logLevelSave(1,"Bu id değerine ait bir departman bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        List<Staff> staffList = staffDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
-        for (Staff staff : staffList) {
-            if (staff.getDepartment().getId() == id) {
-                logLevelSave(4, "Bu departman personel ile ilişkili, siliniemez.");
-                throw new RuntimeException("Bu departman personel ile ilişkili, silinemez.");
-            }
+    public Result getAll(){
+        try {
+            List<DepartmentDTO> departmentDTOS = entityToDtoList(departmentDao.findAll());
+            logLevelSave(2,"Tüm departmanlar listelendi");
+            return new SuccessDataResult("Tüm departmanlar listelendi",true,departmentDTOS);
+        } catch (Exception e) {
+            logLevelSave(1,"Departman listeleme işleminde hata oluştu");
+            return new ErrorResult("Departman listeleme işleminde hata oluştu",false);
         }
-        logLevelSave(3,"Departman silme İşlemi başarılı.");
-        deleteDepartment.setDeleted(true);
-        return departmentDao.save(deleteDepartment);
+    }
+    @Override
+    public Result getById(Long id){
+        try {
+            Department findDepartment = departmentDao.getById(id);
+            logLevelSave(3,"İd değerine göre departman listeleme işlemi başarılı");
+            return new SuccessDataResult("İd değerine göre departman verisi, başarılı bir şekilde döndürüldü",true, entityToDtoObject(findDepartment));
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            logLevelSave(1, "Bu id değerine ait bir departman bulunamadı.");
+            return new ErrorResult("Bu id değerine ait departman bulunamadı",false);
+        }
+    }
+    @Override
+    public Result saveDepartment(DepartmentDTO departmentDTO){
+        try {
+            departmentDao.save(dtoToEntity(departmentDTO));
+            logLevelSave(3,"Departman ekleme işlemi başarılı");
+            return new SuccessDataResult("Departman ekleme işlemi başarılı",true,departmentDTO);
+        }catch (Exception e) {
+            logLevelSave(1,"Departman ekleme  işlemi başarısız");
+            return new ErrorResult("Departman ekleme işlemi başarısız",false);
+        }
+    }
+    @Override
+    public Result updateDepartment(Long id,DepartmentDTO departmentDTO){
+        Department editDepartment;
+        try{
+            editDepartment = departmentDao.getById(id);
+            editDepartment.setName(departmentDTO.getName());
+            departmentDao.save(editDepartment);
+            logLevelSave(3,"Departman güncelleme işlemi başarılı");
+            return new SuccessDataResult("Departman güncelleme işlemi başarılı",true,entityToDtoObject(editDepartment));
+        }catch (Exception e){
+            logLevelSave(1,"Bu id değerine ait departman bulunamadı");
+            return new ErrorResult("Bu id değerine ait departman bulunamadı",false);
+        }
+    }
+    @Override
+    public Result deleteDepartment(Long id)
+    {
+        Department deleteDepartment;
+        try{
+            deleteDepartment = departmentDao.getById(id);
+            List<Staff> staffList = staffDao.findAll();
+            for (Staff staff : staffList){
+                if(staff.getDepartment().getId() == id){
+                    logLevelSave(4,"Bu departman, personel ile ilişki silinemedi");
+                    return new ErrorResult("Bu departman, personel ile ilişkili olduğu için silinemedi",false);
+                }
+            }
+            deleteDepartment.setDeleted(true);
+            departmentDao.save(deleteDepartment);
+            logLevelSave(3, "Departman başarılı şekilde silindi");
+            return new SuccesResult("Departman başarılı şekilde silindi",true);
+        } catch (Exception e) {
+            logLevelSave(1,"Bu id değerine ait departman bulunamadı");
+            return new ErrorResult("Bu id değerine ait departman bulunamadı",false);
+        }
     }
 
 

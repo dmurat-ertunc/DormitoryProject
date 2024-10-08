@@ -14,6 +14,7 @@ import com.dme.DormitoryProject.response.Result;
 import com.dme.DormitoryProject.response.SuccesResult;
 import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,9 +82,18 @@ public class ManagerManager implements IManagerService {
     }
     @Override
     public Result saveManager(ManagerDTO managerDTO){
-        managerDao.save(dtoToEntity(managerDTO));
-        LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
-        return new SuccessDataResult("Yönetici ekleme işlemi başarılı",true,managerDTO);
+        try {
+            managerDao.save(dtoToEntity(managerDTO));
+            LogLevelSave(3,"Yönetici ekleme işlemi başarılı");
+            return new SuccessDataResult("Yönetici ekleme işlemi başarılı",true,managerDTO);
+        }catch (DataIntegrityViolationException dataIntegrityViolationException){
+            LogLevelSave(1, "Email veya telefon numarası daha önceden alınmış");
+            return new ErrorResult("Email veya telefon numarası daha önceden alınmış",false);
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
+            return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
+        }
     }
     public Result updateManager(Long id, ManagerDTO managerDTO){
         Manager editManager;
@@ -98,7 +108,11 @@ public class ManagerManager implements IManagerService {
             LogLevelSave(3,"Yöentici güncelleme işlemi başarılı");
             managerDao.save(editManager);
             return new SuccessDataResult("Yönetici güncelleme  işlemi başarılı",true,entityToDtoObject(editManager));
-        } catch (Exception e) {
+        }catch (DataIntegrityViolationException e) {
+            LogLevelSave(1, "Email veya telefon numarası daha önceden alınmış");
+            return new ErrorResult("Email veya telefon numarası daha önceden alınmış",false);
+        }
+        catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
             LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
             return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
