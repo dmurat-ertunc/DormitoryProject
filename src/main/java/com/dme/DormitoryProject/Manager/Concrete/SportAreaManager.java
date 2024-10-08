@@ -10,7 +10,12 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IRentalDao;
 import com.dme.DormitoryProject.repository.ISportAreaDao;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesResult;
+import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -47,7 +52,7 @@ public class SportAreaManager implements ISporAreaService {
         lgoDao.save(log);
     }
 
-    public List<SportAreaDTO> entityToDto(List<SportArea> sportAreas){
+    public List<SportAreaDTO> entityToDtoList(List<SportArea> sportAreas){
         List<SportAreaDTO> sportAreaDTOS = new ArrayList<>();
 
         for (SportArea sportArea : sportAreas) {
@@ -56,59 +61,83 @@ public class SportAreaManager implements ISporAreaService {
         }
         return sportAreaDTOS;
     }
+    public SportAreaDTO entityToDtoObject(SportArea sportArea){
+        return SportAreaMapper.toDTO(sportArea);
+    }
 
     public SportArea dtoToEntity(SportAreaDTO sportAreaDTO){
         return SportAreaMapper.toEntity(sportAreaDTO);
     }
 
     @Override
-    public List<SportAreaDTO> getAll(){
-        List<SportArea> sportAreaList = sportAreaDao.findAll();
-        LogLevelSave(2,"Tüm spor alanları listelendi");
-        return entityToDto(sportAreaList);
+    public Result getAll(){
+        try {
+            List<SportAreaDTO> sportAreaDTOS = entityToDtoList(sportAreaDao.findAll());
+            LogLevelSave(2,"Spor türleri listelendi");
+            return new SuccessDataResult("Spor türleri listelendi",true,sportAreaDTOS);
+        } catch (Exception e) {
+            LogLevelSave(1,"Spor alanları listelenemedi");
+            return new ErrorResult("Spor alanları listelenemedi",false);
+        }
     }
 
     @Override
-    public Optional<SportAreaDTO> getById(Long id){
-        List<SportAreaDTO> sportAreaDTO = entityToDto(sportAreaDao.findAll());
-        LogLevelSave(2,"Id değeri verilen spor alanı listelendi");
-        return sportAreaDTO.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
-    }
-    @Override
-    public SportArea saveSportArea(SportAreaDTO sportAreaDTO){
-        LogLevelSave(2,"Spor alanı eklendi.");
-        return sportAreaDao.save(dtoToEntity(sportAreaDTO));
-    }
-    @Override
-    public SportArea updateSportArea(Long id,SportAreaDTO sportAreaDTO){
-        SportArea editSportArea = sportAreaDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir spor alanı bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        editSportArea.setSporType(sportAreaDTO.getSportType());
-        LogLevelSave(3,"Spor alanı güncelleme işlemi başarılı");
-        return sportAreaDao.save(editSportArea);
-    }
-    @Override
-    public SportArea deleteSportArea(Long id){
-        SportArea deleteSportArea = sportAreaDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir spor alanı bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        List<Rental> rentalList = rentalDao.findAll();
-        for (Rental rental : rentalList){
-            if(rental.getSportArea().getId() == id){
-                LogLevelSave(1,"Bu spor alanı önceden kiralanmış silinemez.");
-                throw  new RuntimeException("hata");
-            }
+    public Result getById(Long id){
+        try {
+            SportAreaDTO sportAreaDTO = entityToDtoObject(sportAreaDao.getById(id));
+            LogLevelSave(2,"Id değerine göre spor türü listelendi");
+            return new SuccessDataResult("Id değerine göre spor türü listelendi",true,sportAreaDTO);
+        } catch (Exception e) {
+            LogLevelSave(1,"Spor alanlanı listelenemedi");
+            return new ErrorResult("Spor alanı listelenemedi",false);
         }
-        LogLevelSave(3,"Spor Alanı silme İşlemi başarılı.");
-        deleteSportArea.setDeleted(true);
-        return sportAreaDao.save(deleteSportArea);
+    }
+    @Override
+    public Result saveSportArea(SportAreaDTO sportAreaDTO){
+        try {
+            sportAreaDao.save(dtoToEntity(sportAreaDTO));
+            LogLevelSave(3,"Spor türü ekleme işlemi başarılı");
+            return new SuccessDataResult("Spor türü ekleme işlemi başarılı",true,sportAreaDTO);
+        } catch (Exception e) {
+            LogLevelSave(1,"Spor türü ekleme işlemi başarısız");
+            return new ErrorResult("Spor türü ekleme işlemi başarısız",false);
+        }
+    }
+    @Override
+    public Result updateSportArea(Long id,SportAreaDTO sportAreaDTO){
+        SportArea editSportArea;
+        try {
+            editSportArea = sportAreaDao.getById(id);
+            editSportArea.setSporType(sportAreaDTO.getSportType());
+            sportAreaDao.save(editSportArea);
+            LogLevelSave(3,"Spor alanı güncelleme işlemi başarılı");
+            return new SuccessDataResult("Spor alanı güncelleme  işlemi başarılı",true,entityToDtoObject(editSportArea));
+        }catch (Exception e){
+            LogLevelSave(1,"Bu id değerine ait bir spor alanı bulunamadı");
+            return new ErrorResult("Bu id değerine ait bir spor alanı bulunamadı",false);
+        }
+    }
+    @Override
+    public Result deleteSportArea(Long id){
+        SportArea deleteSportArea;
+        try {
+            deleteSportArea = sportAreaDao.getById(id);
+            List<Rental> rentalList = rentalDao.findAll();  // gireilen id değerini içeren bir staff olup olmadığının kontrolü
+            for (Rental rental : rentalList) {
+                if (rental.getSportArea().getId() == id) {
+                    LogLevelSave(4, "Bu spor alanı, kiralama ile ilişkili, siliniemez.");
+                    return new ErrorResult("Bu spor alanı, kiralama ile ilişkili, siliniemez.",false);
+                }
+            }
+            deleteSportArea.setDeleted(true);
+            sportAreaDao.save(deleteSportArea);
+            LogLevelSave(3,"Spor alanı silme İşlemi başarılı.");
+            return new SuccesResult("Spor alanı silme işlemi başarılı",true);
+        } catch (Exception e) {
+            // Eğer varlık bulunamadıysa, bu blok çalışır
+            LogLevelSave(1, "Bu id değerine ait bir spor alanı bulunamadı.");
+            return new ErrorResult("Bu id değerinde spor alanı bulunamadı",false);
+        }
     }
     public LocalDate getMomentDate(){
         return LocalDate.now();

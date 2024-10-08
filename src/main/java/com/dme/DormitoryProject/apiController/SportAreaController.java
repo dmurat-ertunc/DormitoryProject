@@ -3,6 +3,8 @@ package com.dme.DormitoryProject.apiController;
 import com.dme.DormitoryProject.Manager.Abstract.ISporAreaService;
 import com.dme.DormitoryProject.dtos.sportAreaDtos.SportAreaDTO;
 import com.dme.DormitoryProject.entity.SportArea;
+import com.dme.DormitoryProject.response.Result;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,25 +22,25 @@ public class SportAreaController {
     }
 
     @GetMapping("getAll")
-    public List<SportAreaDTO> getAll(){
+    public Result getAll(){
         return this.sporAreaService.getAll();
     }
 
     @GetMapping("sportAreaId/{id}")
-    public Optional<SportAreaDTO> getbyId(@PathVariable Long id){
+    public Result getbyId(@PathVariable Long id){
         return this.sporAreaService.getById(id);
     }
 
     @PostMapping("saveSportArea")
-    public SportArea saveSportArea(@RequestBody SportAreaDTO sportAreaDTO){
+    public Result saveSportArea(@RequestBody @Valid SportAreaDTO sportAreaDTO){
         return this.sporAreaService.saveSportArea(sportAreaDTO);
     }
     @PutMapping("update/{id}")
-    public SportArea updateSportArea(@PathVariable Long id, @RequestBody SportAreaDTO sportAreaDTO){
+    public Result updateSportArea(@PathVariable Long id, @RequestBody @Valid SportAreaDTO sportAreaDTO){
         return this.sporAreaService.updateSportArea(id,sportAreaDTO);
     }
     @PutMapping("delete/{id}")
-    public SportArea deleteSporArea(@PathVariable Long id){
+    public Result deleteSporArea(@PathVariable Long id){
         return this.sporAreaService.deleteSportArea(id);
     }
 }
