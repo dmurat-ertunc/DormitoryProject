@@ -12,7 +12,6 @@ public class DataResult<T> extends Result{
         super(message, status);
     }
 
-
     public T getData() {
         return data;
     }

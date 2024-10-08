@@ -1,8 +1,6 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import com.dme.DormitoryProject.Manager.Abstract.ITitleService;
-import com.dme.DormitoryProject.dtos.managerDtos.ManagerDTO;
-import com.dme.DormitoryProject.dtos.managerDtos.ManagerMapper;
 import com.dme.DormitoryProject.dtos.titleDtos.TitleDTO;
 import com.dme.DormitoryProject.dtos.titleDtos.TitleMapper;
 import com.dme.DormitoryProject.entity.*;
@@ -12,15 +10,13 @@ import com.dme.DormitoryProject.repository.IStaffDao;
 import com.dme.DormitoryProject.repository.ITitleDao;
 import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.Result;
-import com.dme.DormitoryProject.response.SuccesEmptyResult;
+import com.dme.DormitoryProject.response.SuccesResult;
 import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TitleManager implements ITitleService {
@@ -126,7 +122,7 @@ public class TitleManager implements ITitleService {
             LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
             deleteTitle.setDeleted(true);
             titleDao.save(deleteTitle);
-            return new SuccesEmptyResult("Yönetici silme işlemi başarılı",true);
+            return new SuccesResult("Yönetici silme işlemi başarılı",true);
         } catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
             LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");

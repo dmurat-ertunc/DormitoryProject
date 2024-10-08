@@ -11,9 +11,8 @@ import com.dme.DormitoryProject.repository.IManagerDao;
 import com.dme.DormitoryProject.repository.IStaffDao;
 import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.Result;
-import com.dme.DormitoryProject.response.SuccesEmptyResult;
+import com.dme.DormitoryProject.response.SuccesResult;
 import com.dme.DormitoryProject.response.SuccessDataResult;
-import org.hibernate.action.internal.EntityActionVetoException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -119,7 +118,7 @@ public class ManagerManager implements IManagerService {
             LogLevelSave(3,"Yönetici silme İşlemi başarılı.");
             deleteManager.setDeleted(true);
             managerDao.save(deleteManager);
-            return new SuccesEmptyResult("Yönetici silme işlemi başarılı",true);
+            return new SuccesResult("Yönetici silme işlemi başarılı",true);
         } catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
             LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
