@@ -91,8 +91,8 @@ public class ManagerManager implements IManagerService {
             return new ErrorResult("Email veya telefon numarası daha önceden alınmış",false);
         } catch (Exception e) {
             // Eğer varlık bulunamadıysa, bu blok çalışır
-            LogLevelSave(1, "Bu id değerine ait bir yönetici bulunamadı.");
-            return new ErrorResult("Bu id değerinde yönetici bulunamadı",false);
+            LogLevelSave(1, "Yönetici ekleme işlemi başarısız");
+            return new ErrorResult("Yönetici ekleme işlemi başarısız",false);
         }
     }
     public Result updateManager(Long id, ManagerDTO managerDTO){

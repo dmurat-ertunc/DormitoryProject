@@ -88,7 +88,7 @@ public class TitleManager implements ITitleService {
             LogLevelSave(3,"Ünvan ekleme işlemi başarılı");
             return new SuccessDataResult("Ünvan ekleme işlemi başarılı",true,titleDTO);
         } catch (Exception e) {
-            LogLevelSave(3,"Ünvan ekleme işlemi başarısız");
+            LogLevelSave(1,"Ünvan ekleme işlemi başarısız");
             return new ErrorResult("Ünvan ekleme işlemi başarısız",false);
         }
 

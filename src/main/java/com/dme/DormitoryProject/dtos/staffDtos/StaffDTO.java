@@ -1,6 +1,7 @@
 package com.dme.DormitoryProject.dtos.staffDtos;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -24,15 +25,12 @@ public class StaffDTO {
     @Column(unique = true)
     private String phoneNumber;
     @NotNull(message = "Çalışanın bağlı olduğu departman Id alanı boş bırakılamaz")
-    @NotEmpty(message = "Çalışanın bağlı olduğu departman Id alanı boş bırakılamaz")
     private Long departmentId; // Department'ın ID'si
     private String departmentName;
     @NotNull(message = "Çalışan bağlı olduğu ünvan Id alanı boş bırakılamaz")
-    @NotEmpty(message = "Çalışan bağlı olduğu ünvan Id alanı boş bırakılamaz")
     private Long titleId; // Title'ın ID'si
     private String titleName;
     @NotNull(message = "Çalışan bağlı olduğu yönetici Id alanı boş bırakılamaz")
-    @NotEmpty(message = "Çalışan bağlı olduğu yönetici Id alanı boş bırakılamaz")
     private Long managerId; // Manager'ın ID'si
     private String managerMail;
     private String managerName;
