@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface IRentalService {
     Result getAll();
     Result getById(Long id);
-    Rental saveRental(RentalDTO rentalDTO);
-    Rental deleteRental(Long id);
-    Rental updateRental(Long id, RentalDTO rentalDTO);
+    Result saveRental(RentalDTO rentalDTO);
+    Result deleteRental(Long id);
+    Result updateRental(Long id, RentalDTO rentalDTO);
 }

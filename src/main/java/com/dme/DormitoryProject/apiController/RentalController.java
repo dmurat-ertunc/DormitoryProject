@@ -30,15 +30,15 @@ public class RentalController {
         return this.rentalService.getById(id);
     }
     @PostMapping("saveRental")
-    public Rental saveRental(@RequestBody RentalDTO rentalDTO){
+    public Result saveRental(@RequestBody RentalDTO rentalDTO){
         return this.rentalService.saveRental(rentalDTO);
     }
     @PutMapping("update/{id}")
-    public Rental updateRental(@PathVariable Long id,@RequestBody RentalDTO rentalDTO){
+    public Result updateRental(@PathVariable Long id,@RequestBody RentalDTO rentalDTO){
         return this.rentalService.updateRental(id,rentalDTO);
     }
     @PutMapping("delete/{id}")
-    public Rental deleteRental(@PathVariable Long id){
+    public Result deleteRental(@PathVariable Long id){
         return this.rentalService.deleteRental(id);
     }
 }

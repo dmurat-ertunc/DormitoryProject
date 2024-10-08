@@ -12,8 +12,10 @@ import com.dme.DormitoryProject.entity.Staff;
 import com.dme.DormitoryProject.repository.*;
 import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesResult;
 import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -90,55 +92,75 @@ public class RentalManager implements IRentalService {
         }
     }
     @Override
-    public Rental saveRental(RentalDTO rentalDTO){
-        Rental rental = dtoToEntity(rentalDTO);
-        if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
-            LogLevelSave(1,"Kiralama ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
-            throw new RuntimeException("Hata");
-        }
-        List<Rental> rentals = rentalDao.findAll();
-        for(Rental rental1 : rentals){
-            if (rentalDTO.getStartTime().isAfter(rental1.getStartTime())
-                    && rentalDTO.getStartTime().isBefore(rental1.getEndTime())
-                    && Objects.equals(rentalDTO.getRentalDate(),rental1.getRentalDate())) {
-                LogLevelSave(1, "Bu alan daha önce kiralanmış");
-                throw new RuntimeException("Hata");
+    public Result saveRental(RentalDTO rentalDTO){
+        try{
+            Rental rental = dtoToEntity(rentalDTO);
+            if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
+                LogLevelSave(1,"Kiralama ekleme işleminde, ilişki olacağı tablo kaldırılmış.");
+                return new ErrorResult("Kiralama ekleme işleminde, ilişki olacağı tablo kaldırılmış.",false);
             }
+            List<Rental> rentals = rentalDao.findAll();
+            for(Rental rental1 : rentals){
+                if (rentalDTO.getStartTime().isAfter(rental1.getStartTime())
+                        && rentalDTO.getStartTime().isBefore(rental1.getEndTime())
+                        && Objects.equals(rentalDTO.getRentalDate(),rental1.getRentalDate())
+                        && Objects.equals(rental1.getSportArea().getId(),rentalDTO.getSportAreaId())) {
+                    LogLevelSave(1, "Bu alan daha önce kiralanmış");
+                    return new ErrorResult("Bu alan daha önce kiralanmış",false);
+                }
+            }
+            rentalDao.save(dtoToEntity(rentalDTO));
+            LogLevelSave(3,"Kiralama ekleme işlemi başarılır");
+            return new SuccessDataResult("Kiralama ekleme işlemi başarılı",true,rentalDTO);
+        } catch (Exception e) {
+            LogLevelSave(1, "Kiralama ekleme işlemi başarısız");
+            return new ErrorResult("Kiralama ekleme işlemi başarısız",false);
         }
-        LogLevelSave(3,"Kiralama işlemi başarılı.");
-        return rentalDao.save(rental);
     }
     @Override
-    public Rental updateRental(Long id, RentalDTO rentalDTO){
-        Rental editRental = rentalDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir kiralama bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
+    public Result updateRental(Long id, RentalDTO rentalDTO){
+        try{
+            Rental editRental = rentalDao.getById(id);
+            Rental rental = dtoToEntity(rentalDTO);
+            if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
+                LogLevelSave(1,"Kiralama güncelleme işleminde, ilişki olacağı tablo kaldırılmış.");
+                return new ErrorResult("Kiralama güncelleme işleminde, ilişki olacağı tablo kaldırılmış.",false);
+            }
+            List<Rental> rentals = rentalDao.findAll();
+            for(Rental rental1 : rentals){
+                if (rentalDTO.getStartTime().isAfter(rental1.getStartTime())
+                        && rentalDTO.getStartTime().isBefore(rental1.getEndTime())
+                        && Objects.equals(rentalDTO.getRentalDate(),rental1.getRentalDate())
+                        && Objects.equals(rental1.getSportArea().getId(),rentalDTO.getSportAreaId())) {
+                    LogLevelSave(1, "Bu alan daha önce kiralanmış");
+                    return new ErrorResult("Bu alan daha önce kiralanmış",false);
+                }
+            }
+            editRental.setSportArea(sportAreaDao.getById(rentalDTO.getSportAreaId()));
+            editRental.setStudent(studentDao.getById(rentalDTO.getStudentId()));
+            editRental.setEndTime(rental.getEndTime());
+            editRental.setRentalDate(rental.getRentalDate());
+            editRental.setStartTime(rental.getStartTime());
+            rentalDao.save(editRental);
+            LogLevelSave(3,"Kiralama güncelleme işlemi başarılır");
+            return new SuccessDataResult("Kiralama güncelleme işlemi başarılı",true,rentalDTO);
+        } catch (Exception e) {
+            LogLevelSave(1, "Kiralama güncelleme işlemi başarısız");
+            return new ErrorResult("Kiralama güncelleme işlemi başarısız",false);
+        }
 
-        Rental rental = dtoToEntity(rentalDTO);
-        if (rental.getSportArea().getIsDeleted() || rental.getStudent().isDeleted()){
-            LogLevelSave(1,"Kiralama güncelleme işleminde, ilişki olacağı tablo kaldırılmış.");
-            throw new RuntimeException("Hata");
-        }
-        editRental.setSportArea(sportAreaDao.getById(rentalDTO.getSportAreaId()));
-        editRental.setStudent(studentDao.getById(rentalDTO.getStudentId()));
-        editRental.setEndTime(rental.getEndTime());
-        editRental.setRentalDate(rental.getRentalDate());
-        editRental.setStartTime(rental.getStartTime());
-        LogLevelSave(3,"Kiralama güncelleme işlemi başarılı.");
-        return rentalDao.save(editRental);
     }
     @Override
-    public Rental deleteRental(Long id){
-        Rental deleteRental = rentalDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir kiralama bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        deleteRental.setDeleted(true);
-        LogLevelSave(3,"Kiralama silme işlemi başarılı");
-        return rentalDao.save(deleteRental);
+    public Result deleteRental(Long id){
+        try {
+            Rental rental = rentalDao.getById(id);
+            rental.setDeleted(true);
+            LogLevelSave(3,"Kiralama silme işlemi başarılı");
+            return new SuccesResult("Kiralama silme işlemi başarılı",true);
+        } catch (Exception e) {
+            LogLevelSave(1,"Silme işlemi başarısız");
+            return new ErrorResult("Silme işlemi başarısızı",false);
+        }
     }
 }
 //"startTime": "14:30:00",
