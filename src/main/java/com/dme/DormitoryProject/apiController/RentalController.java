@@ -3,6 +3,7 @@ package com.dme.DormitoryProject.apiController;
 import com.dme.DormitoryProject.Manager.Abstract.IRentalService;
 import com.dme.DormitoryProject.dtos.rentalDtos.RentalDTO;
 import com.dme.DormitoryProject.entity.Rental;
+import com.dme.DormitoryProject.response.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +21,12 @@ public class RentalController {
     }
 
     @GetMapping("getAll")
-    public List<RentalDTO> getAll(){
+    public Result getAll(){
         return this.rentalService.getAll();
     }
 
     @GetMapping("rentalId/{id}")
-    public Optional<RentalDTO> getById(@PathVariable Long id){
+    public Result getById(@PathVariable Long id){
         return this.rentalService.getById(id);
     }
     @PostMapping("saveRental")

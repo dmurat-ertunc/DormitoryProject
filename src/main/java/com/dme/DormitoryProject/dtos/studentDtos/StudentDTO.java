@@ -25,7 +25,6 @@ public class StudentDTO {
     @NotEmpty(message = "Öğrenci mail alanı boş bırakılamaz")
     private String mail;
     @NotNull(message = "Öğrenci doğum tarihi alanı boş bırakılamaz")
-    @NotEmpty(message = "Öğrenci doğum tarihi alanı boş bırakılamaz")
     private LocalDate birthDate;
     @NotNull(message = "Öğrenci üniversitesi boş bırakılamaz")
     @NotEmpty(message = "Öğrenci üniversitesi boş bırakılamaz")

@@ -3,6 +3,8 @@ package com.dme.DormitoryProject.apiController;
 import com.dme.DormitoryProject.Manager.Abstract.IUniversityService;
 import com.dme.DormitoryProject.dtos.universityDtos.UniversityDTO;
 import com.dme.DormitoryProject.entity.University;
+import com.dme.DormitoryProject.response.Result;
+import jakarta.validation.Valid;
 import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,23 +21,23 @@ public class UniversityController {
         this.universityService=universityService;
     }
     @GetMapping("getAll")
-    public List<UniversityDTO> getAll(){
+    public Result getAll(){
         return this.universityService.getAll();
     }
     @GetMapping("universityId/{id}")
-    public Optional<UniversityDTO> getById(@PathVariable Long id){
+    public Result getById(@PathVariable Long id){
         return this.universityService.getById(id);
     }
     @PostMapping("saveUniversity")
-    public University saveUniversity(@RequestBody UniversityDTO universityDTO) {
+    public Result saveUniversity(@RequestBody @Valid UniversityDTO universityDTO) {
         return this.universityService.saveUniversity(universityDTO);
     }
     @PutMapping("update/{id}")
-    public University updateUniversity(@PathVariable Long id, @RequestBody UniversityDTO universityDTO) {
+    public Result updateUniversity(@PathVariable Long id, @RequestBody @Valid UniversityDTO universityDTO) {
         return this.universityService.updateUniversity(id,universityDTO);
     }
     @PutMapping("delete/{id}")
-    public University deleteUniversity(@PathVariable Long id){
+    public Result deleteUniversity(@PathVariable Long id){
         return this.universityService.deleteUniversity(id);
     }
 

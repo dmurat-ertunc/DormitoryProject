@@ -1,10 +1,16 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
+import ch.qos.logback.classic.spi.LoggerContextListener;
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentMapper;
 import com.dme.DormitoryProject.entity.*;
 import com.dme.DormitoryProject.repository.*;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesResult;
+import com.dme.DormitoryProject.response.SuccessDataResult;
+import org.hibernate.validator.internal.util.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +37,7 @@ public class StudentManager implements IStudentService{
         this.logLevelDao = logLevelDao;
         this.universityDao = universityDao;
     }
-    public List<StudentDTO> entityToDto(List<Student> students){
+    public List<StudentDTO> entityToDtoList(List<Student> students){
         List<StudentDTO> studentDTOS = new ArrayList<>();
 
         for (Student student : students) {
@@ -39,6 +45,10 @@ public class StudentManager implements IStudentService{
             studentDTOS.add(dto);
         }
         return studentDTOS;
+    }
+
+    public StudentDTO entityToDtoObject(Student student){
+        return StudentMapper.toDto(student);
     }
 
     public Student dtoToEntity(StudentDTO studentDTO){
@@ -56,19 +66,27 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
-    public List<StudentDTO> getAll(){
-        List<Student> studentList = studentDao.findAll();
-        LogLevelSave(2,"Tüm öğrenciler listelendi");
-        return entityToDto(studentList);
+    public Result getAll(){
+        try {
+            List<StudentDTO> studentDTOS = entityToDtoList(studentDao.findAll());
+            LogLevelSave(2,"Tüm öğrenciler listelendi");
+            return new SuccessDataResult("Tüm öğrenciler listelendi",true,studentDTOS);
+        }catch (Exception e){
+            LogLevelSave(1,"Tüm öğrencilerin listelenmesinde bir hata oluştu");
+            return new ErrorResult("Tüm öğrenciler listelenirken hata oluştu",false);
+        }
     }
 
     @Override
-    public Optional<StudentDTO> findStudentById(Long id){
-        List<StudentDTO> studentDTO = entityToDto(studentDao.findAll());
-        LogLevelSave(2,"Id değerine ait öğrenci listelendi");
-        return studentDTO.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
+    public Result findStudentById(Long id){
+        try{
+            StudentDTO studentDTO = entityToDtoObject(studentDao.getById(id));
+            LogLevelSave(2,"İd değerine göre öğrenci listelendi");
+            return new SuccessDataResult("İd değerine göre öğrenci listelendi",true,studentDTO);
+        }catch (Exception e){
+            LogLevelSave(1,"İd değerine göre öğrenci bulunamadı");
+            return new ErrorResult("İd değerine göre öğrenci bulunamadı",false);
+        }
     }
 
     @Override
@@ -77,15 +95,22 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
-    public Student saveStudent(StudentDTO studentDTO){
-        List<Student> students = studentDao.findAll();
+    public Result saveStudent(StudentDTO studentDTO){
 
+        List<Student> students = studentDao.findAll();
         if (control(students,studentDTO,"getMail") || control(students,studentDTO,"getTcNo")){
-            throw new RuntimeException("hata");
+            LogLevelSave(1,"Mail veya kimlik nummarası benzersiz olmalıdır");
+            return new ErrorResult("Mail veya kimlik numarası benzersiz olmaıl",false);
         }
-        studentDTO.setVerify(false);
-        LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
-        return studentDao.save(dtoToEntity(studentDTO));
+        try {
+            studentDTO.setVerify(false);
+            studentDao.save(dtoToEntity(studentDTO));
+            LogLevelSave(3,"Öğrenci ekleme işlemi başarılı");
+            return new SuccessDataResult("Öğrenci ekleme işlemi başarılı",true,studentDTO);
+        }catch (Exception e){
+            LogLevelSave(1,"Öğrenci ekleme işleminde hata oluştu");
+            return new ErrorResult("Öğrenci ekleme  işleminde hata oluştu",false);
+        }
     }
 
     @Override
@@ -94,50 +119,56 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
-    public Student updateStudent(Long id, StudentDTO studentDTO){
-        Student editStudent = studentDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        List<Student> students = studentDao.findAll();
-        students.remove(editStudent);
-        if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getMail")){
-            throw  new RuntimeException("hata");
+    public Result updateStudent(Long id, StudentDTO studentDTO){
+
+        try {
+            Student editStudent = studentDao.getById(id);
+            List<Student> students = studentDao.findAll();
+            students.remove(editStudent);
+            if (control(students,studentDTO,"getTcNo") ||  control(students,studentDTO,"getMail")){
+                LogLevelSave(1,"Mail veya kimlik nummarası benzersiz olmalıdır");
+                return new ErrorResult("Mail veya kimlik numarası benzersiz olmaıl",false);
+            }
+            editStudent.setName(studentDTO.getName());
+            editStudent.setTcNo(studentDTO.getTcNo());
+            editStudent.setBirthDate(studentDTO.getBirthDate());
+            editStudent.setSurName(studentDTO.getSurName());
+            editStudent.setMail(studentDTO.getMail());
+            studentDao.save(editStudent);
+            LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
+            return new SuccessDataResult("Öğrenci güncelleme işlemi başarılı", false,entityToDtoObject(editStudent));
+        } catch (Exception e) {
+            LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
+            return new ErrorResult("Bu id değerine göre öğrenci bulunamadı",false);
         }
-        editStudent.setName(studentDTO.getName());
-        editStudent.setTcNo(studentDTO.getTcNo());
-        editStudent.setBirthDate(studentDTO.getBirthDate());
-        editStudent.setSurName(studentDTO.getSurName());
-        editStudent.setMail(studentDTO.getMail());
-        LogLevelSave(3,"Öğrenci güncelleme işlemi başarılı");
-        return studentDao.save(editStudent);
     }
 
     @Override
-    public Student deleteStudent(Long id){
-        Student deleteStudent = studentDao.findById(id)
-                .orElseThrow(()->{
-                    LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        boolean check=false;
-        List<Rental> rentalList = rentalDao.findAll();
-        for (Rental rental : rentalList) {
-            if (rental.getStudent().getId() == id) {
-                check= true;
-                rental.setDeleted(true);
+    public Result deleteStudent(Long id){
+        try {
+            Student deleteStudent = studentDao.getById(id);
+            boolean check=false;
+            List<Rental> rentalList = rentalDao.findAll();
+            for (Rental rental : rentalList) {
+                if (rental.getStudent().getId() == id) {
+                    check= true;
+                    rental.setDeleted(true);
+                }
             }
-        }
-        if (check){
-            LogLevelSave(3,"Öğrenci silindi ve öğrencinin kiraladığı alanlar silindi");
+            if (check){
+                deleteStudent.setDeleted(true);
+                studentDao.save(deleteStudent);
+                LogLevelSave(3,"Öğrenci silindi ve öğrencinin kiraladığı alanlar silindi");
+                return new SuccesResult("Öğrenci silindi ve öğrencinin kiraladığı alanlar silindi",true);
+            }
             deleteStudent.setDeleted(true);
-            return studentDao.save(deleteStudent);
+            studentDao.save(deleteStudent);
+            LogLevelSave(3,"Öğrenci silme İşlemi başarılı.");
+            return new SuccesResult("Öğrenci silindi",true);
+        } catch (Exception e) {
+            LogLevelSave(1,"Bu id değerine ait bir öğrenci bulunamadı.");
+            return new ErrorResult("Bu id değerine göre öğrenci bulunamadı",false);
         }
-
-        LogLevelSave(3,"Öğrenci silme İşlemi başarılı.");
-        deleteStudent.setDeleted(true);
-        return studentDao.save(deleteStudent);
     }
 
     public boolean control(List<Student> students,StudentDTO studentDTO,String metot){
@@ -149,7 +180,7 @@ public class StudentManager implements IStudentService{
                 Method studentMethod = student.getClass().getMethod(metot);
                 Object studentValue = studentMethod.invoke(student);
                 if (studentValue.equals(dtoValue)) {
-                    LogLevelSave(4,"Aynı " + metot + "değerine sahip öğrenci bulunda");
+                    LogLevelSave(1,"Aynı " + metot + "değerine sahip öğrenci bulunda");
                     return true;
                 }
             }

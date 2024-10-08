@@ -10,6 +10,9 @@ import com.dme.DormitoryProject.entity.LogLevel;
 import com.dme.DormitoryProject.entity.Rental;
 import com.dme.DormitoryProject.entity.Staff;
 import com.dme.DormitoryProject.repository.*;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +50,7 @@ public class RentalManager implements IRentalService {
         log.setMessage(message);
         lgoDao.save(log);
     }
-    public List<RentalDTO> entityToDto(List<Rental> rentals){
+    public List<RentalDTO> entityToDtoList(List<Rental> rentals){
         List<RentalDTO> rentalDTOS = new ArrayList<>();
 
         for (Rental rental : rentals) {
@@ -56,24 +59,35 @@ public class RentalManager implements IRentalService {
         }
         return rentalDTOS;
     }
+    public RentalDTO entityToDtoObject(Rental rental){
+        return RentalMapper.toDTO(rental);
+    }
 
     public Rental dtoToEntity(RentalDTO rentalDTO){
         return RentalMapper.toEntity(rentalDTO,studentDao,sportAreaDao);
     }
 
     @Override
-    public List<RentalDTO> getAll(){
-        List<Rental> rentalList = rentalDao.findAll();
-        LogLevelSave(3,"Tüm kiralamalar listlendi");
-        return entityToDto(rentalList);
+    public Result getAll(){
+        try{
+            List<RentalDTO> rentalDTOS = entityToDtoList(rentalDao.findAll());
+            LogLevelSave(2,"Kiralamalar listelendi");
+            return new SuccessDataResult("Tüm kiralamalar listelendi",true,rentalDTOS);
+        } catch (Exception e) {
+            LogLevelSave(1,"Kiralamalar listenirken bir hata oluştu.");
+            return new ErrorResult("Kiralamalar listelenirken bir hata oluştu",false);
+        }
     }
     @Override
-    public Optional<RentalDTO> getById(Long id){
-        List<RentalDTO> rentalDTOS = entityToDto(rentalDao.findAll());
-        LogLevelSave(3,"Id değerine göre kiralama listlendi");
-        return rentalDTOS.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
+    public Result getById(Long id){
+        try {
+            RentalDTO rentalDTO= entityToDtoObject(rentalDao.getById(id));
+            LogLevelSave(2,"İd değerine göre kiralama listelendi");
+            return new SuccessDataResult("İd değerine göre kiralama listelendi",true,rentalDTO);
+        } catch (Exception e) {
+            LogLevelSave(1,"İd değerine gmre kiralama listelenmesinde hata oluştu");
+            return new ErrorResult("İd değerine gmre kiralama listelenmesinde hata oluştu",false);
+        }
     }
     @Override
     public Rental saveRental(RentalDTO rentalDTO){

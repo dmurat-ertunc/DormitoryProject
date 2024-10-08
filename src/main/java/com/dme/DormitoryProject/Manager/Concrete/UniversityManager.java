@@ -10,6 +10,11 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.repository.ILogLevelDao;
 import com.dme.DormitoryProject.repository.IStudentDao;
 import com.dme.DormitoryProject.repository.IUniversityDao;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccesResult;
+import com.dme.DormitoryProject.response.SuccessDataResult;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +45,10 @@ public class UniversityManager implements IUniversityService {
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
                 .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
         log.setLogLevel(logLevel);
-        log.setAddDate(getMomentDate());
         log.setMessage(message);
         lgoDao.save(log);
     }
-    public List<UniversityDTO> entityToDto(List<University> universities){
+    public List<UniversityDTO> entityToDtoList(List<University> universities){
         List<UniversityDTO> universityDTOS = new ArrayList<>();
 
         for (University university : universities) {
@@ -53,61 +57,78 @@ public class UniversityManager implements IUniversityService {
         }
         return universityDTOS;
     }
+    public UniversityDTO entityToDtoObject(University university){
+        return UniversityMapper.toDTO(university);
+    }
 
     public University dtoToEntity(UniversityDTO universityDTO){
         return UniversityMapper.toEntity(universityDTO,studentDao);
     }
     @Override
-    public List<UniversityDTO> getAll(){
-        List<University> universities = universityDao.findAll();
-        LogLevelSave(2,"Tüm üniversiteler listelendi");
-        return entityToDto(universities);
+    public Result getAll(){
+       try {
+           List<UniversityDTO> universityDTOS = entityToDtoList(universityDao.findAll());
+           LogLevelSave(2,"Tüm üniversitler listelendi");
+           return new SuccessDataResult("Tüm üniversiteler listelendi",true,universityDTOS);
+       }catch (Exception e){
+           LogLevelSave(1,"Üniversiteler listelenirken hata oluştu.");
+           return new ErrorResult("Üniversiteler listeleirken hata oluştu",false);
+       }
     }
     @Override
-    public Optional<UniversityDTO> getById(Long id){
-        List<UniversityDTO> universityDTOS = entityToDto(universityDao.findAll());
-        LogLevelSave(2,"Id değerine göre üniversite listelendi.");
-        return universityDTOS.stream()
-                .filter(dto -> dto.getId().equals(id))
-                .findFirst();
-    }
-    @Override
-    public University saveUniversity(UniversityDTO universityDTO){
-
-        LogLevelSave(3,"Üniversite ekleme işlemi başarılı");
-        return universityDao.save(dtoToEntity(universityDTO));
-    }
-    @Override
-    public University updateUniversity(Long id, UniversityDTO universityDTO) {
-        University editUniversity = universityDao.findById(id)
-                .orElseThrow(() ->{
-                    LogLevelSave(1,"Bu id değerine ait bir üniversite bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        editUniversity.setName(universityDTO.getName());
-        editUniversity.setcity(universityDTO.getCity());
-        editUniversity.setmail(universityDTO.getMail());
-        editUniversity.setphoneNumber(universityDTO.getPhoneNumber());
-        LogLevelSave(3,"Üniversite güncelleme işlemi başarılı.");
-        return universityDao.save(editUniversity);
-    }
-    @Override
-    public University deleteUniversity(Long id){
-        University deleteUniversity = universityDao.findById(id)
-                .orElseThrow(()->{
-                    LogLevelSave(1,"Bu id değerine ait bir üniversite bulunamadı.");
-                    return new RuntimeException("Bu id'ye sahip veri yok: " + id);
-                });
-        List<Student> studentList = studentDao.findByUniversityId(id);
-        if (studentList != null){
-            LogLevelSave(4, "Bu üniversite öğrenci ile ilişkili, siliniemez.");
-            throw new RuntimeException("Bu üniversite öğrenci ile ilişkili, silinemez.");
+    public Result getById(Long id){
+        try{
+            UniversityDTO universityDTO = entityToDtoObject(universityDao.getById(id));
+            LogLevelSave(2,"İd değerine göre üniversite listelendi");
+            return new SuccessDataResult("İd değerine göre üniversite listelendi",true,universityDTO);
+        } catch (Exception e) {
+            LogLevelSave(1,"İd değerine göre üniversite listelenirken hata oluştu");
+            return new ErrorResult("İd değerine göre üniversite listelenirken hata oluştu",false);
         }
-        LogLevelSave(3,"Üniversite silme İşlemi başarılı.");
-        deleteUniversity.setDeleted(true);
-        return universityDao.save(deleteUniversity);
     }
-    public LocalDate getMomentDate(){
-        return LocalDate.now();
+    @Override
+    public Result saveUniversity(UniversityDTO universityDTO){
+        try{
+            universityDao.save(dtoToEntity(universityDTO));
+            LogLevelSave(3,"Üniversite kaydedildi");
+            return new SuccessDataResult("Üniversite kaydedildi",true,universityDTO);
+        }catch (Exception e){
+            LogLevelSave(1,"Üniversite kaydedilemedi");
+            return new ErrorResult("Üniversitesi kaydedilemedi",false);
+        }
+    }
+    @Override
+    public Result updateUniversity(Long id, UniversityDTO universityDTO) {
+
+        try {
+            University editUniversity = universityDao.getById(id);
+            editUniversity.setName(universityDTO.getName());
+            editUniversity.setcity(universityDTO.getCity());
+            editUniversity.setmail(universityDTO.getMail());
+            editUniversity.setphoneNumber(universityDTO.getPhoneNumber());
+            LogLevelSave(3,"Üniversite güncelleme işlemi başarılı.");
+            return new SuccessDataResult("Üniversite güncelleme işlemi başarılı",true,entityToDtoObject(editUniversity));
+        } catch (Exception e) {
+            LogLevelSave(1,"Bu id değerine ait bir üniversite bulunamadı");
+            return new ErrorResult("Bu id değerine ait bir üniversite bulunamadı",false);
+        }
+    }
+    @Override
+    public Result deleteUniversity(Long id){
+        List<Student> studentList = studentDao.findByUniversityId(id);
+        if (!studentList.isEmpty()){
+            LogLevelSave(1, "Bu üniversite öğrenci ile ilişkili, siliniemez.");
+            return new ErrorResult("Bu üniversite öğrenci ile ilişkili, silinemez.",false);
+        }
+        try {
+            University deleteUniversity = universityDao.getById(id);
+            deleteUniversity.setDeleted(true);
+            universityDao.save(deleteUniversity);
+            LogLevelSave(3,"Üniversite silme İşlemi başarılı.");
+            return new SuccesResult("Üniversite silme işlemi başarlı",true);
+        } catch (Exception e) {
+            LogLevelSave(1,"Bu id değerine göre üniversite bulunamadı");
+            return new ErrorResult("Bu id değerine göre üniversite bulunamadı",false);
+        }
     }
 }

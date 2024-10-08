@@ -1,8 +1,10 @@
 package com.dme.DormitoryProject.dtos.universityDtos;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,7 +17,10 @@ public class UniversityDTO {
     @NotNull(message = "Üniversite mail alanı boş geçilemez")
     @NotEmpty(message = "Üniversite mail alanı boş geçilemez")
     @Column(unique = true)
+    @Email
     private String mail;
+    @Pattern(regexp = "^[0-9]+$", message = "Sadece rakam içermelidir.")
+    @Pattern(regexp = "^0\\d{10}$", message = "Telefon numarası 0 ile başlamalı ve 11 karakter olmalıdır.")
     @NotNull(message = "Üniversite telefon numarası alanı boş geçilemez")
     @NotEmpty(message = "Üniversite telefon numarası alanı boş geçilemez")
     @Column(unique = true)

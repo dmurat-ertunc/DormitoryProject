@@ -5,6 +5,8 @@ import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
 import com.dme.DormitoryProject.Manager.Concrete.StudentManager;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.entity.Student;
+import com.dme.DormitoryProject.response.Result;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +26,12 @@ public class StudentController {
     }
 
     @GetMapping("getAll")
-    public List<StudentDTO> getAll(){
+    public Result getAll(){
         return studentService.getAll();
     }
 
     @GetMapping("studentId/{id}")
-    public Optional<StudentDTO> getById(@PathVariable Long id){
+    public Result getById(@PathVariable Long id){
         return this.studentService.findStudentById(id);
     }
 
@@ -40,7 +42,7 @@ public class StudentController {
     }
 
     @PostMapping("saveStudent")
-    public Student saveStudent(@RequestBody StudentDTO studentDTO){
+    public Result saveStudent(@RequestBody @Valid StudentDTO studentDTO){
         return this.studentService.saveStudent(studentDTO);
     }
 
@@ -49,11 +51,11 @@ public class StudentController {
         return this.studentService.saveStudentAll(students);
     }
     @PutMapping("update/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody StudentDTO studentDTO){
+    public Result updateStudent(@PathVariable Long id, @RequestBody @Valid StudentDTO studentDTO){
         return this.studentService.updateStudent(id,studentDTO);
     }
     @PutMapping("delete/{id}")
-    public Student deleteStudent(@PathVariable Long id){
+    public Result deleteStudent(@PathVariable Long id){
         return this.studentService.deleteStudent(id);
     }
 }
