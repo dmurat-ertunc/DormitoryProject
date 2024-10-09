@@ -15,9 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,29 +38,58 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "0 10 11 * * ?")
+    @Scheduled(cron = "00 40 17 * * ?")
     public void exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("logs");
+        Workbook workbook;
+        Sheet sheet;
+        File file = new File("logs.xlsx");
 
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"Id","Description","Message"};
-
-        for (int i = 0 ; i < headers.length ; i++){
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+        // Var olan dosyayı açma
+        try (FileInputStream fis = new FileInputStream(file)) {
+            workbook = new XSSFWorkbook(fis);
+            // "logs" adında bir sayfa var mı kontrol et
+            sheet = workbook.getSheet("logs");
+            if (sheet == null) {
+                // Eğer "logs" sayfası yoksa yeni bir sayfa oluştur
+                sheet = workbook.createSheet("logs");
+            }
+        } catch (FileNotFoundException e) {
+            // Dosya bulunamazsa yeni bir workbook oluştur
+            workbook = new XSSFWorkbook();
+            sheet = workbook.createSheet("logs");
+            Row headerRow = sheet.createRow(0);
+            String[] headers = {"Id","Description","Message"};
+            for (int i = 0 ; i < headers.length ; i++){
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return; // Hata durumunda işlemi durdur
         }
 
-        int rowNum = 1;
+        int rowCount = 0;
+
+        try (FileInputStream fis = new FileInputStream("logs.xlsx");
+             Workbook workbook1 = new XSSFWorkbook(fis)) {
+
+            Sheet sheet1 = workbook1.getSheet("logs"); // İlgili sayfayı al
+            if (sheet != null) {
+                rowCount = sheet.getPhysicalNumberOfRows(); // Fiziksel satır sayısını al
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         for (LgoDTO lgoDTO : lgoDTOList) {
-            Row row = sheet.createRow(rowNum++);
+            Row row = sheet.createRow(rowCount++);
 
             row.createCell(0).setCellValue(lgoDTO.getId());
-            row.createCell(2).setCellValue(lgoDTO.getLogLevelDescription());
-            row.createCell(3).setCellValue(lgoDTO.getMessage());
+            row.createCell(1).setCellValue(lgoDTO.getLogLevelDescription());
+            row.createCell(2).setCellValue(lgoDTO.getMessage());
         }
         try (FileOutputStream fileOut = new FileOutputStream("logs.xlsx")) {
             workbook.write(fileOut);
@@ -76,6 +103,8 @@ public class LogDataSendExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        lgoDao.deleteAll();
 
     }
 }
