@@ -7,6 +7,9 @@ import com.dme.DormitoryProject.dtos.lgoDtos.LgoMapper;
 import com.dme.DormitoryProject.entity.Department;
 import com.dme.DormitoryProject.entity.Lgo;
 import com.dme.DormitoryProject.repository.ILgoDao;
+import com.dme.DormitoryProject.response.ErrorResult;
+import com.dme.DormitoryProject.response.Result;
+import com.dme.DormitoryProject.response.SuccessDataResult;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -38,8 +41,8 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "10 57 17 * * ?")
-    public void exportLogToExcel(){
+    @Scheduled(cron = "20 55 20 * * ?")
+    public Result exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);
         Workbook workbook;
@@ -66,7 +69,7 @@ public class LogDataSendExcel {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return; // Hata durumunda işlemi durdur
+            return new ErrorResult("Hata",false); // Hata durumunda işlemi durdur
         }
         int rowCount = 0;
         try (FileInputStream fis = new FileInputStream("logs.xlsx");
@@ -97,7 +100,9 @@ public class LogDataSendExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         System.out.println(file.getAbsoluteFile());
         lgoDao.deleteAll();
+        return new SuccessDataResult("Bu URL ile dosyayı indirebilirsiniz",true,file.getAbsoluteFile());
     }
 }
