@@ -38,14 +38,13 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "00 40 17 * * ?")
+    @Scheduled(cron = "10 57 17 * * ?")
     public void exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);
         Workbook workbook;
         Sheet sheet;
         File file = new File("logs.xlsx");
-
         // Var olan dosyayı açma
         try (FileInputStream fis = new FileInputStream(file)) {
             workbook = new XSSFWorkbook(fis);
@@ -69,9 +68,7 @@ public class LogDataSendExcel {
             e.printStackTrace();
             return; // Hata durumunda işlemi durdur
         }
-
         int rowCount = 0;
-
         try (FileInputStream fis = new FileInputStream("logs.xlsx");
              Workbook workbook1 = new XSSFWorkbook(fis)) {
 
@@ -83,10 +80,8 @@ public class LogDataSendExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         for (LgoDTO lgoDTO : lgoDTOList) {
             Row row = sheet.createRow(rowCount++);
-
             row.createCell(0).setCellValue(lgoDTO.getId());
             row.createCell(1).setCellValue(lgoDTO.getLogLevelDescription());
             row.createCell(2).setCellValue(lgoDTO.getMessage());
@@ -96,15 +91,13 @@ public class LogDataSendExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         // Bellekteki kaynakları serbest bırak
         try {
             workbook.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println(file.getAbsoluteFile());
         lgoDao.deleteAll();
-
     }
 }
