@@ -10,16 +10,16 @@ import com.dme.DormitoryProject.repository.ILgoDao;
 import com.dme.DormitoryProject.response.ErrorResult;
 import com.dme.DormitoryProject.response.Result;
 import com.dme.DormitoryProject.response.SuccessDataResult;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -41,7 +41,7 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "00 05 09 * * ?")
+    @Scheduled(cron = "00 41 09 * * ?")
     public Result exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);
@@ -83,12 +83,25 @@ public class LogDataSendExcel {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        CreationHelper createHelper = workbook.getCreationHelper();
+        CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy"));
+
+        for (LgoDTO lgoDTO : lgoDTOList){
+            LocalDate localDate = lgoDTO.getDate();  // Tarihin buradan geldiğini varsayıyoruz
+        }
+        LocalDate localDate = LocalDate.now();
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
         for (LgoDTO lgoDTO : lgoDTOList) {
             Row row = sheet.createRow(rowCount++);
             row.createCell(0).setCellValue(lgoDTO.getId());
             row.createCell(1).setCellValue(lgoDTO.getLogLevelDescription());
             row.createCell(2).setCellValue(lgoDTO.getMessage());
             row.createCell(3).setCellValue(lgoDTO.getDate());
+            row.getCell(3).setCellStyle(cellStyle);
+            System.out.println(lgoDTO.getDate());
         }
         try (FileOutputStream fileOut = new FileOutputStream("logs.xlsx")) {
             workbook.write(fileOut);
