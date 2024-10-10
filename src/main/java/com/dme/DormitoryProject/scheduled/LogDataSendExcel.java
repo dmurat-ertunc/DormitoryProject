@@ -41,7 +41,7 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "20 55 20 * * ?")
+    @Scheduled(cron = "00 05 09 * * ?")
     public Result exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);
@@ -62,7 +62,7 @@ public class LogDataSendExcel {
             workbook = new XSSFWorkbook();
             sheet = workbook.createSheet("logs");
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"Id","Description","Message"};
+            String[] headers = {"Id","Description","Message","Date"};
             for (int i = 0 ; i < headers.length ; i++){
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -88,6 +88,7 @@ public class LogDataSendExcel {
             row.createCell(0).setCellValue(lgoDTO.getId());
             row.createCell(1).setCellValue(lgoDTO.getLogLevelDescription());
             row.createCell(2).setCellValue(lgoDTO.getMessage());
+            row.createCell(3).setCellValue(lgoDTO.getDate());
         }
         try (FileOutputStream fileOut = new FileOutputStream("logs.xlsx")) {
             workbook.write(fileOut);

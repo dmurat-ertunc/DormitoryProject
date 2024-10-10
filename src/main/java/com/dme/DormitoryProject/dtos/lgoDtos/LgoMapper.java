@@ -11,6 +11,7 @@ public class LgoMapper {
         lgoDTO.setMessage(lgo.getMessage());
         lgoDTO.setLogLeveId(lgo.getLogLevel().getId());
         lgoDTO.setLogLevelDescription(lgo.getLogLevel().getDescription());
+        lgoDTO.setDate(lgo.getAddDate());
 
         return lgoDTO;
     }

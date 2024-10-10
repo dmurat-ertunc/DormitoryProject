@@ -1,11 +1,14 @@
 package com.dme.DormitoryProject.dtos.lgoDtos;
 
+import java.time.LocalDate;
+
 public class LgoDTO {
 
     private Long id;
     private Long logLeveId;
     private String message;
     private String logLevelDescription;
+    private LocalDate date;
 
     public void setId(Long id) {
         this.id = id;
@@ -37,5 +40,13 @@ public class LgoDTO {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }
