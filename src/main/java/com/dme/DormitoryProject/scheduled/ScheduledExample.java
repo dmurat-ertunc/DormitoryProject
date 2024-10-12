@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScheduledExample {
 
-    @Scheduled(cron = "0 58 10 * * ?")
+    @Scheduled(cron = "0 47 20 * * ?")
     public void exapmle(){
         for (int i=1; i<=10; i++){
             System.out.println(i);
