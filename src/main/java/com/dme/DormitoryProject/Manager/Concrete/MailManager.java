@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MailManager implements IMailService {
-
     private JavaMailSender mailSender;
 
     @Autowired
@@ -16,13 +15,11 @@ public class MailManager implements IMailService {
         this.mailSender = mailSender;
     }
 
-
-
     @Override
     public String sendMail() {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom("cengdme@gmail.com");
-        simpleMailMessage.setTo("enesaktepe181@gmail.com");
+        simpleMailMessage.setTo("dursunmuratertunc@gmail.com");
         simpleMailMessage.setText("dme dme dme dme");
         simpleMailMessage.setSubject("Sakın açma lan");
         mailSender.send(simpleMailMessage);
