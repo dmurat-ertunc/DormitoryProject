@@ -85,8 +85,7 @@ public class StudentManager implements IStudentService{
         try{
             StudentDTO studentDTO = entityToDtoObject(studentDao.getById(id));
             LogLevelSave(2,"İd değerine göre öğrenci listelendi");
-            redisService.setData();
-            System.out.println(redisService.getData());
+
             return new SuccessDataResult("İd değerine göre öğrenci listelendi",true,studentDTO);
         }catch (Exception e){
             LogLevelSave(1,"İd değerine göre öğrenci bulunamadı");
@@ -101,7 +100,11 @@ public class StudentManager implements IStudentService{
 
     @Override
     public Result saveStudent(StudentDTO studentDTO){
-
+        redisService.setData();
+        System.out.println(redisService.getData());
+        redisService.waitStudentData(studentDTO);
+        System.out.println(redisService.getStudentData());
+        //return new SuccessDataResult("dsaads",true,redisService.getStudentData());
         List<Student> students = studentDao.findAll();
         if (control(students,studentDTO,"getMail") || control(students,studentDTO,"getTcNo")){
             LogLevelSave(1,"Mail veya kimlik nummarası benzersiz olmalıdır");

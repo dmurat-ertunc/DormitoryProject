@@ -35,9 +35,14 @@ public class RedisManager implements IRedisService {
     }
 
     @Override
-    public StudentDTO waitStudentData(StudentDTO studentDTO){
+    public void waitStudentData(StudentDTO studentDTO){
         String key = "studentData";
         redisTemplate.opsForValue().set(key,studentDTO,120,TimeUnit.SECONDS);
+    }
+
+    @Override
+    public StudentDTO getStudentData(){
+        String key = "studentData";
         return (StudentDTO) redisTemplate.opsForValue().get(key);
     }
 }

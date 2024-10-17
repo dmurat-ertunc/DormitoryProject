@@ -5,11 +5,12 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-public class StudentDTO {
+public class StudentDTO implements Serializable {
     private Long id;
     @NotNull(message = "Öğrenci isim alanı boş bırakılamaz")
     @NotEmpty(message = "Öğrenci isim alanı boş bırakılamaz")

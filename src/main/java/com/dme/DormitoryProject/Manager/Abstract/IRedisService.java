@@ -7,5 +7,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 public interface IRedisService {
     void setData();
     long getData();
-    StudentDTO waitStudentData(StudentDTO studentDTO);
+    void waitStudentData(StudentDTO studentDTO);
+    StudentDTO getStudentData();
 }
