@@ -25,12 +25,12 @@ public class RedisManager implements IRedisService {
         String key = "kod";
         Random random = new Random();
         Object value = 100000 + random.nextInt(900000);
-        redisTemplate.opsForValue().set(key, value,120,TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value,60,TimeUnit.SECONDS);
     }
 
     @Override
     public long getData() {
-        String key = "Code";
+        String key = "kod";
         return (Long) redisTemplate.opsForValue().get(key);
     }
 

@@ -85,8 +85,8 @@ public class StudentManager implements IStudentService{
         try{
             StudentDTO studentDTO = entityToDtoObject(studentDao.getById(id));
             LogLevelSave(2,"İd değerine göre öğrenci listelendi");
+            redisService.setData();
             System.out.println(redisService.getData());
-            //redisService.setData();
             return new SuccessDataResult("İd değerine göre öğrenci listelendi",true,studentDTO);
         }catch (Exception e){
             LogLevelSave(1,"İd değerine göre öğrenci bulunamadı");
