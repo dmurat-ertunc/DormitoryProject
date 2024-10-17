@@ -31,7 +31,7 @@ public class RedisManager implements IRedisService {
     @Override
     public long getData() {
         String key = "kod";
-        return (Long) redisTemplate.opsForValue().get(key);
+        return (Integer) redisTemplate.opsForValue().get(key);
     }
 
     @Override
