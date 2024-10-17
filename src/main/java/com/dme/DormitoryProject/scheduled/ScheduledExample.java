@@ -13,7 +13,7 @@ public class ScheduledExample {
         }
     }
 
-    @Scheduled(fixedRate = 3000)
+    //@Scheduled(fixedRate = 3000)
     public void example1(){
         for (int i=11; i<=20; i++){
             System.out.println(i);

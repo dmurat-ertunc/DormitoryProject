@@ -1,6 +1,7 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import ch.qos.logback.classic.spi.LoggerContextListener;
+import com.dme.DormitoryProject.Manager.Abstract.IRedisService;
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentMapper;
@@ -28,14 +29,16 @@ public class StudentManager implements IStudentService{
     private ILgoDao lgoDao;
     private ILogLevelDao logLevelDao;
     private IUniversityDao universityDao;
+    private IRedisService redisService;
 
     @Autowired
-    public StudentManager(IStudentDao studentDao, IRentalDao rentalDao, ILgoDao lgoDao, ILogLevelDao logLevelDao,IUniversityDao universityDao) {
+    public StudentManager(IStudentDao studentDao, IRentalDao rentalDao, ILgoDao lgoDao, ILogLevelDao logLevelDao,IUniversityDao universityDao,IRedisService redisService) {
         this.studentDao = studentDao;
         this.rentalDao = rentalDao;
         this.lgoDao = lgoDao;
         this.logLevelDao = logLevelDao;
         this.universityDao = universityDao;
+        this.redisService=redisService;
     }
     public List<StudentDTO> entityToDtoList(List<Student> students){
         List<StudentDTO> studentDTOS = new ArrayList<>();
@@ -82,6 +85,8 @@ public class StudentManager implements IStudentService{
         try{
             StudentDTO studentDTO = entityToDtoObject(studentDao.getById(id));
             LogLevelSave(2,"İd değerine göre öğrenci listelendi");
+            System.out.println(redisService.getData());
+            //redisService.setData();
             return new SuccessDataResult("İd değerine göre öğrenci listelendi",true,studentDTO);
         }catch (Exception e){
             LogLevelSave(1,"İd değerine göre öğrenci bulunamadı");
