@@ -92,6 +92,16 @@ public class RentalManager implements IRentalService {
         }
     }
     @Override
+    public Result afterRental(LocalTime startTime){
+        List<Rental> rentals = rentalDao.findByStartTimeAfter(startTime);
+        if (rentals !=  null && !rentals.isEmpty()){
+            LogLevelSave(3, "Girilen saatten sonra olan kiralamalar k-listelendi");
+            return new SuccessDataResult("Girilen saatten sonra olan kiralamalar k-listelendi",true,entityToDtoList(rentals));
+        }
+        LogLevelSave(1,"Kiralama bulunamadı");
+        return new ErrorResult("Kiralama bulunamadı",false);
+    }
+    @Override
     public Result saveRental(RentalDTO rentalDTO){
         try{
             Rental rental = dtoToEntity(rentalDTO);

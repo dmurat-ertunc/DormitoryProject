@@ -7,6 +7,7 @@ import com.dme.DormitoryProject.response.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +29,10 @@ public class RentalController {
     @GetMapping("rentalId/{id}")
     public Result getById(@PathVariable Long id){
         return this.rentalService.getById(id);
+    }
+    @GetMapping("afterStartTime")
+    public Result afterStartTime(@RequestParam LocalTime startTime){
+        return this.rentalService.afterRental(startTime);
     }
     @PostMapping("saveRental")
     public Result saveRental(@RequestBody RentalDTO rentalDTO){
