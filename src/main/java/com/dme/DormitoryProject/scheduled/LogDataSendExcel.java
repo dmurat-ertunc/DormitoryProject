@@ -41,7 +41,7 @@ public class LogDataSendExcel {
         return lgoDTOS;
     }
 
-    @Scheduled(cron = "00 51 20 * * ?")
+    @Scheduled(cron = "20 06 13 * * ?")
     public Result exportLogToExcel(){
         List<Lgo> lgoList = lgoDao.findAll();
         List<LgoDTO> lgoDTOList = entityToDtoList(lgoList);

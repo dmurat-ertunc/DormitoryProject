@@ -13,4 +13,5 @@ public interface IDepartmentService {
     Result saveDepartment(DepartmentDTO departmentDTO);
     Result updateDepartment(Long id, DepartmentDTO departmentDTO);
     Result deleteDepartment(Long id);
+    Result startingWithWord(String prefix);
 }

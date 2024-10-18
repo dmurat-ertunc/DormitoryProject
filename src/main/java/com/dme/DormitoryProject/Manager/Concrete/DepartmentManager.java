@@ -137,6 +137,16 @@ public class DepartmentManager implements IDepartmentService{
             return new ErrorResult("Bu id değerine ait departman bulunamadı",false);
         }
     }
+    @Override
+    public Result startingWithWord(String prefix){
+        List<Department> departments = departmentDao.findByNameStartingWith(prefix);
+        if (departments !=  null && !departments.isEmpty()){
+            logLevelSave(3, "Baş harfi değerine göre departman veya departmanlar başarılı şekilde listelendi");
+            return new SuccessDataResult("Baş harfi değerine göre departman veya departmanlar başarılı şekilde listelendi",true,entityToDtoList(departments));
+        }
+        logLevelSave(1,"Bu harf ile başlayan departman departman bulunamadı");
+        return new ErrorResult("Bu harf ile başlayan departman departman bulunamadı",false);
+    }
 
 
 }

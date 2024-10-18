@@ -45,7 +45,10 @@ public class DepartmentController {
     public Result deleteDepartment(@PathVariable Long id){
         return this.departmentService.deleteDepartment(id);
     }
-
+    @GetMapping("startingWithWord")
+    public Result startingWithWord(@RequestParam String prefix){
+        return this.departmentService.startingWithWord(prefix);
+    }
 
 
 }

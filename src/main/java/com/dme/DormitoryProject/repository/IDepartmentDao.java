@@ -17,4 +17,5 @@ public interface IDepartmentDao extends JpaRepository<Department,Long> {
     @Query("SELECT d FROM Department d WHERE d.isDeleted = false")
     List<Department> findAll();
     //DepartmentDTO findDepartmenDTOById(Long id);
+    List<Department> findByNameStartingWith(String prefix);
 }
