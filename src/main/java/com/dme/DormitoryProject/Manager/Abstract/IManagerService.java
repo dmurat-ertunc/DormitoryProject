@@ -12,4 +12,5 @@ public interface IManagerService {
     Result saveManager(ManagerDTO managerDTO);
     Result updateManager(Long id,ManagerDTO managerDTO);
     Result deleteManager(Long id);
+    Result findBySalaryGreaterThan(int salary);
 }

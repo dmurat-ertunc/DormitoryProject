@@ -81,6 +81,16 @@ public class ManagerManager implements IManagerService {
         }
     }
     @Override
+    public Result findBySalaryGreaterThan(int salary){
+        List<Manager> managers = managerDao.findBySalaryGreaterThan(salary);
+        if (managers !=  null && !managers.isEmpty()){
+            LogLevelSave(3, "Belirtilen miktardan fazla maaş alan yöneticileri başarılı şekilde listelendi");
+            return new SuccessDataResult("Belirtilen miktardan fazla maaş alan yöneticileri başarılı şekilde listelendi",true,entityToDtoList(managers));
+        }
+        LogLevelSave(1,"Belirtilen miktardan fazla maaş alan yönetici bulunamadı");
+        return new ErrorResult("Belirtilen miktardan fazla maaş alan yönetici bulunamadı",false);
+    }
+    @Override
     public Result saveManager(ManagerDTO managerDTO){
         try {
             managerDao.save(dtoToEntity(managerDTO));

@@ -30,6 +30,10 @@ public class ManagerController {
     public Result getById(@PathVariable Long id){
         return this.managerService.getById(id);
     }
+    @GetMapping("findSalaryGreater")
+    public Result findSalaryGreater(@RequestParam int salary){
+        return this.managerService.findBySalaryGreaterThan(salary);
+    }
     @PostMapping("saveManager")
     public Result saveManager(@RequestBody @Valid ManagerDTO managerDTO){
         return this.managerService.saveManager(managerDTO);

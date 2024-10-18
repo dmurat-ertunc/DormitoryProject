@@ -11,4 +11,5 @@ public interface IManagerDao extends JpaRepository<Manager,Long> {
     //Manager findManagerById(Long id);
     @Query("SELECT d FROM Manager d WHERE d.isDeleted = false")
     List<Manager> findAll();
+    List<Manager> findBySalaryGreaterThan(int salary);
 }
