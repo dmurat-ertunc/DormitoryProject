@@ -3,6 +3,7 @@ package com.dme.DormitoryProject.apiController;
 
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
 import com.dme.DormitoryProject.Manager.Concrete.StudentManager;
+import com.dme.DormitoryProject.dtos.mailVerification.MailVerificationDTO;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.entity.Student;
 import com.dme.DormitoryProject.response.Result;
@@ -45,6 +46,15 @@ public class StudentController {
     public Result saveStudent(@RequestBody @Valid StudentDTO studentDTO){
         return this.studentService.saveStudent(studentDTO);
     }
+    @GetMapping("sendMail/{id}")
+    public Result sendMail(@PathVariable Long id){
+        return this.studentService.sendMail(id);
+    }
+
+    @PutMapping("mailVerification/{id}")
+    public Result mailVerification(@PathVariable Long id,@RequestParam String mailCode){
+        return this.studentService.mailVerification(id,mailCode);
+    }
 
     @PostMapping("saveStudentsAll")
     public List<Student> saveStudentAll(@RequestBody List<Student> students) {
@@ -58,4 +68,6 @@ public class StudentController {
     public Result deleteStudent(@PathVariable Long id){
         return this.studentService.deleteStudent(id);
     }
+
+
 }

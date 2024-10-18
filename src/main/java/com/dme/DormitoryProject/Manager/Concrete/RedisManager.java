@@ -25,7 +25,7 @@ public class RedisManager implements IRedisService {
         String key = "kod";
         Random random = new Random();
         Object value = 100000 + random.nextInt(900000);
-        redisTemplate.opsForValue().set(key, value,60,TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value,180,TimeUnit.SECONDS);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class RedisManager implements IRedisService {
     @Override
     public void waitStudentData(StudentDTO studentDTO){
         String key = "studentData";
-        redisTemplate.opsForValue().set(key,studentDTO,120,TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key,studentDTO,180,TimeUnit.SECONDS);
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.dme.DormitoryProject.Manager.Concrete;
 
 import ch.qos.logback.classic.spi.LoggerContextListener;
+import com.dme.DormitoryProject.Manager.Abstract.IMailService;
 import com.dme.DormitoryProject.Manager.Abstract.IRedisService;
 import com.dme.DormitoryProject.Manager.Abstract.IStudentService;
+import com.dme.DormitoryProject.dtos.mailVerification.MailVerificationDTO;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentDTO;
 import com.dme.DormitoryProject.dtos.studentDtos.StudentMapper;
 import com.dme.DormitoryProject.entity.*;
@@ -30,15 +32,17 @@ public class StudentManager implements IStudentService{
     private ILogLevelDao logLevelDao;
     private IUniversityDao universityDao;
     private IRedisService redisService;
+    private IMailService mailService;
 
     @Autowired
-    public StudentManager(IStudentDao studentDao, IRentalDao rentalDao, ILgoDao lgoDao, ILogLevelDao logLevelDao,IUniversityDao universityDao,IRedisService redisService) {
+    public StudentManager(IStudentDao studentDao, IRentalDao rentalDao, ILgoDao lgoDao, ILogLevelDao logLevelDao,IUniversityDao universityDao,IRedisService redisService, IMailService mailService) {
         this.studentDao = studentDao;
         this.rentalDao = rentalDao;
         this.lgoDao = lgoDao;
         this.logLevelDao = logLevelDao;
         this.universityDao = universityDao;
         this.redisService=redisService;
+        this.mailService=mailService;
     }
     public List<StudentDTO> entityToDtoList(List<Student> students){
         List<StudentDTO> studentDTOS = new ArrayList<>();
@@ -100,11 +104,6 @@ public class StudentManager implements IStudentService{
 
     @Override
     public Result saveStudent(StudentDTO studentDTO){
-        redisService.setData();
-        System.out.println(redisService.getData());
-        redisService.waitStudentData(studentDTO);
-        System.out.println(redisService.getStudentData());
-        //return new SuccessDataResult("dsaads",true,redisService.getStudentData());
         List<Student> students = studentDao.findAll();
         if (control(students,studentDTO,"getMail") || control(students,studentDTO,"getTcNo")){
             LogLevelSave(1,"Mail veya kimlik nummarası benzersiz olmalıdır");
@@ -119,6 +118,25 @@ public class StudentManager implements IStudentService{
             LogLevelSave(1,"Öğrenci ekleme işleminde hata oluştu");
             return new ErrorResult("Öğrenci ekleme  işleminde hata oluştu",false);
         }
+    }
+
+    @Override
+    public Result sendMail(Long id){
+        Student student = studentDao.getById(id);
+        redisService.setData();
+        mailService.sendMail(student.getMail(), redisService.getData());
+        return new SuccesResult("Mail adresine doğrulama kodu gönderildi",true);
+    }
+
+    @Override
+    public Result mailVerification(Long id, String mailCode){
+        Student student = studentDao.getById(id);
+        if(redisService.getData() == Integer.parseInt(mailCode)){
+            student.setVerify(true);
+            studentDao.save(student);
+            return new SuccesResult("Doğrulama işlemi başarılı",true);
+        }
+        return new ErrorResult("Doğrulama işlemi başarısız",false);
     }
 
     @Override
