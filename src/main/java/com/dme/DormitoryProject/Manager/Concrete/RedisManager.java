@@ -22,7 +22,7 @@ public class RedisManager implements IRedisService {
 
     @Override
     public void setData() {
-        String key = "kod";
+        String key = "code";
         Random random = new Random();
         Object value = 100000 + random.nextInt(900000);
         redisTemplate.opsForValue().set(key, value,180,TimeUnit.SECONDS);
@@ -30,7 +30,7 @@ public class RedisManager implements IRedisService {
 
     @Override
     public long getData() {
-        String key = "kod";
+        String key = "code";
         return (Integer) redisTemplate.opsForValue().get(key);
     }
 
