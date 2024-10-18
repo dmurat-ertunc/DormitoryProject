@@ -140,6 +140,17 @@ public class StudentManager implements IStudentService{
     }
 
     @Override
+    public Result findUniversityId(Long id){
+        List<Student> students = studentDao.findByUniversity_Id(id);
+        if (students !=  null && !students.isEmpty()){
+            LogLevelSave(3, "Girilen üniversitede eğitim alan öğrenciler listelendi");
+            return new SuccessDataResult("Girilen üniversitede eğitim alan öğrenciler listelendi",true,entityToDtoList(students));
+        }
+        LogLevelSave(1,"Bu üniversiteye ait öğrenci bulunamadı");
+        return new ErrorResult("Bu üniversiteye ait öğrenci bulunamadı",false);
+    }
+
+    @Override
     public List<Student> saveStudentAll(List<Student> students){
         return studentDao.saveAll(students);
     }

@@ -19,6 +19,7 @@ public interface IStudentDao extends JpaRepository<Student,Long> {
     @Query("SELECT d FROM Student d WHERE d.isDeleted = false")
     List<Student> findAll();
     List<Student> findByUniversityId(Long universityId);
+    List<Student> findByUniversity_Id(Long universityId);
 
 
 }

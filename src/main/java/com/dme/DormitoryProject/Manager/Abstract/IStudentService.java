@@ -19,4 +19,5 @@ public interface IStudentService {
     Result deleteStudent(Long id);
     Result mailVerification(Long id, String mailCode);
     Result sendMail(Long id);
+    Result findUniversityId(Long id);
 }

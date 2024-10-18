@@ -56,6 +56,11 @@ public class StudentController {
         return this.studentService.mailVerification(id,mailCode);
     }
 
+    @GetMapping("findByUniversityId/{id}")
+    public Result findByUniversityId(@PathVariable Long id){
+        return this.studentService.findUniversityId(id);
+    }
+
     @PostMapping("saveStudentsAll")
     public List<Student> saveStudentAll(@RequestBody List<Student> students) {
         return this.studentService.saveStudentAll(students);
