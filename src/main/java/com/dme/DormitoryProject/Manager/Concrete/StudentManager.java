@@ -123,15 +123,15 @@ public class StudentManager implements IStudentService{
     @Override
     public Result sendMail(Long id){
         Student student = studentDao.getById(id);
-        redisService.setData();
-        mailService.sendMail(student.getMail(), redisService.getData());
+        redisService.setData(id);
+        mailService.sendMail(student.getMail(), redisService.getData(id));
         return new SuccesResult("Mail adresine doğrulama kodu gönderildi",true);
     }
 
     @Override
     public Result mailVerification(Long id, String mailCode){
         Student student = studentDao.getById(id);
-        if(redisService.getData() == Integer.parseInt(mailCode)){
+        if(redisService.getData(id) == Integer.parseInt(mailCode)){
             student.setVerify(true);
             studentDao.save(student);
             return new SuccesResult("Doğrulama işlemi başarılı",true);

@@ -21,16 +21,16 @@ public class RedisManager implements IRedisService {
     }
 
     @Override
-    public void setData() {
-        String key = "code";
+    public void setData(Long id) {
+        String key = "code-"+id;
         Random random = new Random();
         Object value = 100000 + random.nextInt(900000);
         redisTemplate.opsForValue().set(key, value,180,TimeUnit.SECONDS);
     }
 
     @Override
-    public long getData() {
-        String key = "code";
+    public long getData(Long id) {
+        String key = "code-"+id;
         return (Integer) redisTemplate.opsForValue().get(key);
     }
 
