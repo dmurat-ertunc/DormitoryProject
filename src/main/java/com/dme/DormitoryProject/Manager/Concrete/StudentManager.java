@@ -66,7 +66,7 @@ public class StudentManager implements IStudentService{
         Lgo log = new Lgo();
         long searchLogLevelId= id;
         LogLevel logLevel = logLevelDao.findById(searchLogLevelId)
-                .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadı: " + searchLogLevelId));
+                .orElseThrow(() -> new RuntimeException("Bu id'ye sahip LogLevel bulunamadi: " + searchLogLevelId));
         log.setLogLevel(logLevel);
         log.setMessage(message);
         lgoDao.save(log);
